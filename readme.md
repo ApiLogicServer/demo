@@ -79,9 +79,9 @@ As shown above:
 
 | About                    | Info                               |
 |:-------------------------|:-----------------------------------|
-| Created                  | April 25, 2023 12:51:54                      |
-| API Logic Server Version | 08.02.05           |
-| Created in directory     | ../../Org-ApiLogicServer/demo |
+| Created                  | April 26, 2023 07:29:28                      |
+| API Logic Server Version | 08.02.06           |
+| Created in directory     | ../../servers/demo |
 | API Name                 | api          |
 
 &nbsp;&nbsp;
