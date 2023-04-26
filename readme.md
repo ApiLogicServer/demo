@@ -30,64 +30,18 @@ To run your project, the system requires various runtime systems for data access
     * Choose the __either__ the _Local Install_ __or__ the _Docker_ approach below, then 
 2. __Run__
 
+For instructions, [see here](#setup-instructions).
 
 &nbsp;
-
-## Establish Your Python Environment - Local Install
-
-You `requirements.txt` has already been created, so...
-
-```bash title="Install API Logic Server in a Virtual Environment"
-python -m venv venv                        # may require python3 -m venv venv
-venv\Scripts\activate                      # mac/linux: source venv/bin/activate
-python -m pip install -r requirements.txt  # accept "new Virtual environment"
-```
-
-Notes:
-
-* See also the `venv_setup` directory in this API Logic Project.
-
-* If using SqlServer, install `pyodbc`.  Not required for docker-based projects.  For local installs, see the [Quick Start](https://apilogicserver.github.io/Docs/Install-pyodbc/).
-
-&nbsp;
-
-## Establish Your Python Environment - Docker
-
-Your runtime systems are part of Dev Container, which you probably activated when you [opened the project](https://apilogicserver.github.io/Docs/IDE-Execute/).  If you did not accept the "Open in Container" option when you started VSCode, use __View > Command Palette > Remote-Containers: Reopen in Container__.
-
-&nbsp;
-
-## Run
-
-To run your project
-
-![Start Project](https://github.com/ApiLogicServer/Docs/blob/main/docs/images/nutshell/project-executable.png?raw=true)
-
-As shown above:
-
-1. Use the pre-supplied Run Configuration
-2. Click the url in the console to start the Admin App
-    * Use it to explore your data (shown below)
-    * And your API (via Swagger)
-
-![Admin App](https://github.com/ApiLogicServer/Docs/blob/main/docs/images/ui-admin/run-admin-app.png?raw=true)
-
-
-&nbsp;&nbsp;
-
-# Project Information
-
-| About                    | Info                               |
-|:-------------------------|:-----------------------------------|
-| Created                  | April 26, 2023 07:29:28                      |
-| API Logic Server Version | 08.02.06           |
-| Created in directory     | ../../servers/demo |
-| API Name                 | api          |
-
-&nbsp;&nbsp;
 
 # Project Structure
-This project was created with the following directory structure:
+This project was created with the directory structure shown below.
+
+The ___Key Customization Files___ in the table are created as stubs, intended for you to add customizations that extend
+the created API, Logic and Web App.  Since they are separate files, the project can be
+[rebuilt](https://apilogicserver.github.io/Docs/Project-Rebuild/) (e.g., synchronized with a revised schema), preserving your customizations.
+
+Please see the ```nw``` sample for examples of typical customizations.  You can open it in GitHub (use Shift + "." to view in project mode) - [click here](https://github.com/ApiLogicServer/demo).
 
 | Directory | Usage                         | Key Customization File             | Typical Customization                                                                 |
 |:-------------- |:------------------------------|:-----------------------------------|:--------------------------------------------------------------------------------------|
@@ -97,17 +51,17 @@ This project was created with the following directory structure:
 | ```ui``` | Admin App                     | ```ui/admin/admin.yaml```          | Control field display - order, captions etc.                                          |
 | ```security``` | Authentication, Authorization   | ```security/declare_security.py```          | Control login, role-based row access         |
 | ```tests``` | Behave Test Suite              | ```tests/api_logic_server_behave/features```          | Declare and implement [Behave Tests](https://apilogicserver.github.io/Docs/Behave/)                                          |
+
 &nbsp;
 
-### Key Customization File - Typical Customization
+# Project Information
 
-In the table above, the _Key Customization Files_ are created as stubs, intended for you to add customizations that extend
-the created API, Logic and Web App.  Since they are separate files, the project can be
-[rebuilt](https://apilogicserver.github.io/Docs/Project-Rebuild/) (e.g., synchronized with a revised schema), preserving your customizations.
-
-Please see the ```nw``` sample for examples of typical customizations.
-
-&nbsp;&nbsp;
+| About                    | Info                               |
+|:-------------------------|:-----------------------------------|
+| Created                  | April 26, 2023 08:10:06                      |
+| API Logic Server Version | 08.02.06           |
+| Created in directory     | ../../servers/demo |
+| API Name                 | api          |
 
 
 # Key Technologies
@@ -170,3 +124,48 @@ This generated project also contains a React Admin app:
 * Multi-table - master / details (with tab sheets)
 * Intelligent layout - favorite fields first, predictive joins, etc
 * Logic Aware - updates are monitored by business logic
+
+
+# Setup Instructions
+
+
+&nbsp;
+
+## Establish Your Python Environment - Local Install
+
+You `requirements.txt` has already been created, so...
+
+```bash title="Install API Logic Server in a Virtual Environment"
+python -m venv venv                        # may require python3 -m venv venv
+venv\Scripts\activate                      # mac/linux: source venv/bin/activate
+python -m pip install -r requirements.txt  # accept "new Virtual environment"
+```
+
+Notes:
+
+* See also the `venv_setup` directory in this API Logic Project.
+
+* If using SqlServer, install `pyodbc`.  Not required for docker-based projects.  For local installs, see the [Quick Start](https://apilogicserver.github.io/Docs/Install-pyodbc/).
+
+&nbsp;
+
+## Establish Your Python Environment - Docker
+
+Your runtime systems are part of Dev Container, which you probably activated when you [opened the project](https://apilogicserver.github.io/Docs/IDE-Execute/).  If you did not accept the "Open in Container" option when you started VSCode, use __View > Command Palette > Remote-Containers: Reopen in Container__.
+
+&nbsp;
+
+## Run
+
+To run your project
+
+![Start Project](https://github.com/ApiLogicServer/Docs/blob/main/docs/images/nutshell/project-executable.png?raw=true)
+
+As shown above:
+
+1. Use the pre-supplied Run Configuration
+2. Click the url in the console to start the Admin App
+    * Use it to explore your data (shown below)
+    * And your API (via Swagger)
+
+![Admin App](https://github.com/ApiLogicServer/Docs/blob/main/docs/images/ui-admin/run-admin-app.png?raw=true)
