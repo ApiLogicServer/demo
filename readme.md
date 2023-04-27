@@ -58,11 +58,13 @@ Please see the ```nw``` sample for examples of typical customizations.  You can 
 
 | About                    | Info                               |
 |:-------------------------|:-----------------------------------|
-| Created                  | April 26, 2023 08:10:06                      |
-| API Logic Server Version | 08.02.06           |
+| Created                  | April 26, 2023 19:42:45                      |
+| API Logic Server Version | 08.03.00           |
 | Created in directory     | ../../servers/demo |
 | API Name                 | api          |
 
+
+&nbsp;
 
 # Key Technologies
 
@@ -116,7 +118,6 @@ created automatically by API Logic Server from your database,
 and saved in the `database` directory.
 
 
-
 ### Admin App
 
 This generated project also contains a React Admin app:
@@ -126,8 +127,9 @@ This generated project also contains a React Admin app:
 * Logic Aware - updates are monitored by business logic
 
 
-# Setup Instructions
+&nbsp;
 
+# Setup Instructions
 
 &nbsp;
 
