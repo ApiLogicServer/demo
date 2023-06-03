@@ -15,7 +15,7 @@ from database import models
 from logic_bank.rule_bank.rule_bank import RuleBank
 
 # Called by api_logic_server_run.py, to customize api (new end points, services -- see add_order).
-# Separate from expose_api_models.py, to simplify merge if project recreated
+# Separate from expose_api_models.py, to simplify merge if project rebuilt
 
 
 def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
@@ -30,6 +30,10 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
 
     app_logger = logging.getLogger("api_logic_server_app")  # only for create-and-run, no?
 
+    
+    app_logger.info("..api/expose_service.py, exposing custom services: hello_world, add_order")
+    api.expose_object(ServicesEndPoint)
+    api.expose_object(CategoriesEndPoint)
 
     @app.route('/hello_world')
     def hello_world():  # test it with: http://localhost:5656/hello_world?user=ApiLogicServer
@@ -158,10 +162,6 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
         Used by test/*.py - enables client app to log msg into server
         """
         return util.server_log(request, jsonify)
-    
-    app_logger.info("..api/expose_service.py, exposing custom services: hello_world, add_order")
-    api.expose_object(ServicesEndPoint)
-    api.expose_object(CategoriesEndPoint)
 
 
 class ServicesEndPoint(safrs.JABase):

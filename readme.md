@@ -12,7 +12,7 @@ The standard API Logic Project Readme follows, below.
 
 To run your project, the system requires various runtime systems for data access, api, and logic.  These are included with API Logic Server ([architecture doc here](https://apilogicserver.github.io/Docs/Architecture-What-Is/)).  So, to run your project ([instructions here](#setup-instructions)):
 
-1.  __Establish your Python Environment__ to activate these runtime system
+1.  __Establish your Python Environment__ to activate these runtime systems
 2. __Run__
 
 &nbsp;
@@ -31,12 +31,18 @@ Please see the `nw` sample for examples of typical customizations.  You can open
 
 | Directory | Usage                         | Key Customization File             | Typical Customization                                                                 |
 |:-------------- |:------------------------------|:-----------------------------------|:--------------------------------------------------------------------------------------|
-| ```api``` | JSON:API                      | ```api/customize_api.py```         | Add new end points / services                                                         |
+| ```api``` | **JSON:API**<br>*Ready to Run*                    | ```api/customize_api.py```         | Add new end points / services                                                         |
+| ```ui``` | **Multi-Page Admin App**<br>*Ready to Run*  | ```ui/admin/admin.yaml```          | Control field display - order, captions etc.                                          |
 | ```database``` | SQLAlchemy Data Model Classes | ```database/customize_models.py``` | Add derived attributes, and relationships missing in the schema                       |
-| ```logic``` | Transactional Logic           | ```logic/declare_logic.py```       | Declare multi-table derivations, constraints, and events such as send mail / messages |
-| ```ui``` | Admin App                     | ```ui/admin/admin.yaml```          | Control field display - order, captions etc.                                          |
+| ```logic``` | **Transactional Logic**<br>spreadsheet-like rules   | ```logic/declare_logic.py```       | Declare multi-table derivations, constraints, and Python events such as send mail / messages |
 | ```security``` | Authentication, Authorization   | ```security/declare_security.py```          | Control login, role-based row access         |
 | ```tests``` | Behave Test Suite              | ```tests/api_logic_server_behave/features```          | Declare and implement [Behave Tests](https://apilogicserver.github.io/Docs/Behave/)                                          |
+
+&nbsp;
+
+# Project Requirements
+
+Optionally, you can **document requirements** as part of an **executable test plan**.  Test plan execution creates documentation (in markdown), including **requirements traceability** into implementation.  [See example here](test/api_logic_server_behave/reports/Behave%20Logic%20Report%20Sample.md).
 
 &nbsp;
 
@@ -47,9 +53,9 @@ For information on Managing API Logic Projects, [click here](https://apilogicser
 
 | About                    | Info                               |
 |:-------------------------|:-----------------------------------|
-| Created                  | April 29, 2023 16:19:07                      |
-| API Logic Server Version | 08.03.03           |
-| Created in directory     | ../../servers/demo |
+| Created                  | June 03, 2023 14:44:09                      |
+| API Logic Server Version | 08.04.14           |
+| Created in directory     | ../../Org-ApiLogicServer/demo |
 | API Name                 | api          |
 | Execution begins with    | `api_logic_server_run.py`          |
 
@@ -90,11 +96,13 @@ Your runtime systems are part of Dev Container, which you probably activated whe
 
 To run your project
 
-![Start Project](https://github.com/ApiLogicServer/Docs/blob/main/docs/images/nutshell/project-executable.png?raw=true)
+![Start Project](https://github.com/ApiLogicServer/Docs/blob/main/docs/images/tutorial/2-apilogicproject-nutshell.png?raw=true)
 
 As shown above:
 
-1. Use the pre-supplied Run Configuration
+1. Use the pre-supplied Run Configuration; use either:
+    * `**ApiLogicServer - No Security (e.g., for behave tests** to run *with security* (recommended initially)
+    * `**ApiLogicServer** to run [with security](https://apilogicserver.github.io/Docs/Security-Swagger/)
 2. Click the url in the console to start the Admin App
     * Use it to explore your data (shown below)
     * And your API (via Swagger)

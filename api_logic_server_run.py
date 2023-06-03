@@ -3,7 +3,7 @@
 """
 ==============================================================================
 
-    This file initializes and starts the API Logic Server (v 08.03.03, April 29, 2023 16:19:07):
+    This file initializes and starts the API Logic Server (v 08.04.14, June 03, 2023 14:44:09):
         $ python3 api_logic_server_run.py [--help]
 
     Then, access the Admin App and API via the Browser, eg:  
@@ -79,8 +79,8 @@ current_path = os.path.abspath(os.path.dirname(__file__))
 with open(f'{current_path}/logging.yml','rt') as f:  # see also logic/declare_logic.py
         config=yaml.safe_load(f.read())
         f.close()
-logging.config.dictConfig(config)  # log levels: critical < error < warning(20) < info(30) < debug
-app_logger = logging.getLogger(__name__)
+logging.config.dictConfig(config)  # log levels: notset 0, debug 10, info 20, warn 30, error 40, critical 50
+app_logger = logging.getLogger("api_logic_server_app")
 debug_value = os.getenv('APILOGICPROJECT_DEBUG')
 if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
     debug_value = debug_value.upper()
@@ -100,7 +100,7 @@ for each_arg in sys.argv:
         args += ", "
 project_name = os.path.basename(os.path.normpath(current_path))
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with args: \n.. {args}\n')
-app_logger.info(f'Created April 29, 2023 16:19:07 at {str(current_path)}\n')
+app_logger.info(f'Created June 03, 2023 14:44:09 at {str(current_path)}\n')
 
 from typing import TypedDict
 import safrs  # fails without venv - see https://apilogicserver.github.io/Docs/Project-Env/
@@ -283,7 +283,9 @@ def get_args():
 
 
 # ==========================================================
-# Creates flask_app, Opens Database, Activates API and Logic 
+# Creates flask_app, starts server after setup:
+#   - Opens Database(s)
+#   - Setup API, Logic, Security, Optimistic Locking 
 # ==========================================================
 
 def create_app(swagger_host: str = "localhost", swagger_port: str = "5656"):
@@ -303,8 +305,10 @@ def create_app(swagger_host: str = "localhost", swagger_port: str = "5656"):
         db_log_level = db_logger.getEffectiveLevel()
         do_hide_chatty_logging = True
         if do_hide_chatty_logging and app_logger.getEffectiveLevel() <= logging.INFO:
-            safrs.log.setLevel(logging.WARN)  # debug is 10, warn is 20, info 30
+            safrs.log.setLevel(logging.WARN)  # notset 0, debug 10, info 20, warn 30, error 40, critical 50
             db_logger.setLevel(logging.WARN)
+            safrs_init_logger = logging.getLogger("safrs.safrs_init")
+            safrs_init_logger.setLevel(logging.WARN)
         flask_app.config.from_object("config.Config")
 
         # https://stackoverflow.com/questions/34674029/sqlalchemy-query-raises-unnecessary-warning-about-sqlite-and-decimal-how-to-spe
@@ -358,6 +362,7 @@ def create_app(swagger_host: str = "localhost", swagger_port: str = "5656"):
                 + f' -- {len(database.models.metadata.tables)} tables loaded\n')  # db opened 1st access
             
             method_decorators : list = []
+            safrs_init_logger.setLevel(logging.WARN)
             expose_api_models.expose_models(safrs_api, method_decorators)
             app_logger.info(f'Declare   API - api/expose_api_models, endpoint for each table on {swagger_host}:{swagger_port}, customizing...')
             customize_api.expose_services(flask_app, safrs_api, project_dir, swagger_host=swagger_host, PORT=port)  # custom services
@@ -372,6 +377,13 @@ def create_app(swagger_host: str = "localhost", swagger_port: str = "5656"):
                 from security import declare_security  # activate security
                 app_logger.info("..declare security - security/declare_security.py"
                     + f' -- {len(database.authentication_models.metadata.tables)} authentication tables loaded')
+
+            from api.system.opt_locking import opt_locking
+            from config import OptLocking
+            if Config.OPT_LOCKING == OptLocking.IGNORED.value:
+                app_logger.info("\nOptimistic Locking: ignored")
+            else:
+                opt_locking.opt_locking_setup(session)
 
             SAFRSBase._s_auto_commit = False
             session.close()
@@ -393,7 +405,7 @@ if os.getenv('VERBOSE'):
 
 if verbose:
     app_logger.setLevel(logging.DEBUG)
-    safrs.log.setLevel(logging.DEBUG)  # debug is 10, warn is 20, info 30
+    safrs.log.setLevel(logging.DEBUG)  # notset 0, debug 10, info 20, warn 30, error 40, critical 50
 if app_logger.getEffectiveLevel() == logging.DEBUG:
     util.sys_info()
 
@@ -403,7 +415,7 @@ admin_events(flask_app = flask_app, swagger_host = swagger_host, swagger_port = 
     API_PREFIX=API_PREFIX, validation_error=ValidationError, http_type = http_type)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 08.03.03\n'
+    msg = f'API Logic Project loaded (not WSGI), version 08.04.14\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {flask_host} - may require refresh)\n'
     else:
@@ -423,7 +435,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=flask_host, threaded=True, port=port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 08.03.03\n'
+    msg = f'API Logic Project Loaded (WSGI), version 08.04.14\n'
     if is_docker():
         msg += f' (running from docker container at {flask_host} - may require refresh)\n'
     else:

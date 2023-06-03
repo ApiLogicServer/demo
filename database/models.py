@@ -16,6 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from safrs import SAFRSBase
 from flask_login import UserMixin
 import safrs, flask_sqlalchemy
+from safrs import jsonapi_attr
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy() 
@@ -39,6 +40,24 @@ class Category(SAFRSBase, Base):
     CategoryName = Column(String(8000))
     Description = Column(String(8000))
     Client_id = Column(Integer)
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class Customer(SAFRSBase, Base):
@@ -67,6 +86,24 @@ class Customer(SAFRSBase, Base):
     OrderList = relationship('Order', cascade_backrefs=True, backref='Customer')
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class CustomerDemographic(SAFRSBase, Base):
     __tablename__ = 'CustomerDemographic'
     _s_collection_name = 'CustomerDemographic'  # type: ignore
@@ -75,6 +112,24 @@ class CustomerDemographic(SAFRSBase, Base):
     Id = Column(String(8000), primary_key=True)
     CustomerDesc = Column(String(8000))
     allow_client_generated_ids = True
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class Department(SAFRSBase, Base):
@@ -93,6 +148,24 @@ class Department(SAFRSBase, Base):
     EmployeeList1 = relationship('Employee', primaryjoin='Employee.WorksForDepartmentId == Department.Id', cascade_backrefs=True, backref='Department1')
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class Location(SAFRSBase, Base):
     __tablename__ = 'Location'
     _s_collection_name = 'Location'  # type: ignore
@@ -104,6 +177,24 @@ class Location(SAFRSBase, Base):
     allow_client_generated_ids = True
 
     OrderList = relationship('Order', cascade_backrefs=True, backref='Location')
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class Product(SAFRSBase, Base):
@@ -126,6 +217,24 @@ class Product(SAFRSBase, Base):
     OrderDetailList = relationship('OrderDetail', cascade_backrefs=True, backref='Product')
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class Region(SAFRSBase, Base):
     __tablename__ = 'Region'
     _s_collection_name = 'Region'  # type: ignore
@@ -133,6 +242,24 @@ class Region(SAFRSBase, Base):
 
     Id = Column(Integer, primary_key=True)
     RegionDescription = Column(String(8000))
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class SampleDBVersion(SAFRSBase, Base):
@@ -144,6 +271,24 @@ class SampleDBVersion(SAFRSBase, Base):
     Notes = Column(String(800))
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class Shipper(SAFRSBase, Base):
     __tablename__ = 'Shipper'
     _s_collection_name = 'Shipper'  # type: ignore
@@ -152,6 +297,24 @@ class Shipper(SAFRSBase, Base):
     Id = Column(Integer, primary_key=True)
     CompanyName = Column(String(8000))
     Phone = Column(String(8000))
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class Supplier(SAFRSBase, Base):
@@ -173,6 +336,24 @@ class Supplier(SAFRSBase, Base):
     HomePage = Column(String(8000))
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class Territory(SAFRSBase, Base):
     __tablename__ = 'Territory'
     _s_collection_name = 'Territory'  # type: ignore
@@ -186,6 +367,24 @@ class Territory(SAFRSBase, Base):
     EmployeeTerritoryList = relationship('EmployeeTerritory', cascade_backrefs=True, backref='Territory')
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class Union(SAFRSBase, Base):
     __tablename__ = 'Union'
     _s_collection_name = 'Union'  # type: ignore
@@ -195,6 +394,24 @@ class Union(SAFRSBase, Base):
     Name = Column(String(80))
 
     EmployeeList = relationship('Employee', cascade_backrefs=True, backref='Union')
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 t_sqlite_sequence = Table(
@@ -242,6 +459,24 @@ class Employee(SAFRSBase, Base):
     OrderList = relationship('Order', cascade_backrefs=True, backref='Employee')
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class EmployeeAudit(SAFRSBase, Base):
     __tablename__ = 'EmployeeAudit'
     _s_collection_name = 'EmployeeAudit'  # type: ignore
@@ -258,6 +493,24 @@ class EmployeeAudit(SAFRSBase, Base):
     # see backref on parent: Employee = relationship('Employee', cascade_backrefs=True, backref='EmployeeAuditList')
 
 
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
+
+
 class EmployeeTerritory(SAFRSBase, Base):
     __tablename__ = 'EmployeeTerritory'
     _s_collection_name = 'EmployeeTerritory'  # type: ignore
@@ -270,6 +523,24 @@ class EmployeeTerritory(SAFRSBase, Base):
 
     # see backref on parent: Employee = relationship('Employee', cascade_backrefs=True, backref='EmployeeTerritoryList')
     # see backref on parent: Territory = relationship('Territory', cascade_backrefs=True, backref='EmployeeTerritoryList')
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class Order(SAFRSBase, Base):
@@ -292,7 +563,7 @@ class Order(SAFRSBase, Base):
     ShipAddress = Column(String(8000))
     ShipCity = Column(String(8000))
     ShipRegion = Column(String(8000))
-    ShipPostalCode = Column(String(8000))
+    ShipZip = Column('ShipPostalCode', String(8000))  # manual fix - alias
     ShipCountry = Column(String(8000))
     AmountTotal = Column(DECIMAL(10, 2))
     Country = Column(String(50))
@@ -308,6 +579,24 @@ class Order(SAFRSBase, Base):
 
     parent = relationship('Order', remote_side=[Id], cascade_backrefs=True, backref='OrderList')  # special handling for self-relationships
     OrderDetailList = relationship('OrderDetail', cascade='all, delete', cascade_backrefs=True, backref='Order')  # manual fix
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_
 
 
 class OrderDetail(SAFRSBase, Base):
@@ -326,3 +615,21 @@ class OrderDetail(SAFRSBase, Base):
 
     # see backref on parent: Order = relationship('Order', cascade_backrefs=True, backref='OrderDetailList')
     # see backref on parent: Product = relationship('Product', cascade_backrefs=True, backref='OrderDetailList')
+
+
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, flask_sqlalchemy.model.DefaultMeta):
+            #  print("class")
+            return None
+        else:
+            if hasattr(self,"_check_sum_property"):
+              return self._check_sum_property
+            else:
+              return None  # property does not exist during initialization
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+
+    S_CheckSum = _check_sum_

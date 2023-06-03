@@ -36,8 +36,18 @@ loggers:
         handlers: [console]
         propagate: no
 
+    api_logic_server_app:
+        level: INFO
+        handlers: [console]
+        propagate: no
+
     safrs:
         level: DEBUG
+        handlers: [console]
+        propagate: no
+
+    api.system.opt_locking:
+        level: INFO
         handlers: [console]
         propagate: no
 

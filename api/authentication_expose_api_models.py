@@ -12,14 +12,16 @@ app_logger = logging.getLogger(__name__)
 app_logger.debug("\napi/expose_api_models.py - endpoint for each table")
 
 
-def expose_models(api, method_decorators = []):  # th 
+def expose_models(api, method_decorators = []): 
     """
-        Declare API - on existing SAFRSAPI 
-            This exposes each model (note: end point names are table names) 
-            Including get (filtering, pagination, related data access) 
-            And post/patch/update (including logic enforcement) 
+        Declare API - on existing SAFRSAPI to expose each model - API automation 
+        - Including get (filtering, pagination, related data access) 
+        - And post/patch/update (including logic enforcement) 
+
+        Invoked at server startup (api_logic_server_run) 
+
         You typically do not customize this file 
-            See https://apilogicserver.github.io/Docs/Tutorial/#customize-and-debug 
+        - See https://apilogicserver.github.io/Docs/Tutorial/#customize-and-debug 
     """
     api.expose_object(database.authentication_models.Api, method_decorators= method_decorators)
     api.expose_object(database.authentication_models.User, method_decorators= method_decorators)
