@@ -1,6 +1,6 @@
 ## Problem Statement
 
-Optimistic locking is a valuable feature for interactive systems, to **avoid update overwrites** and **maximize concurrency**, with **without requiring special database columns**.
+Optimistic locking is a valuable feature for interactive systems, to **avoid update overwrites** and **maximize concurrency**, **without requiring special database columns**.
 
 &nbsp;
 
@@ -8,11 +8,11 @@ Optimistic locking is a valuable feature for interactive systems, to **avoid upd
 
 Most systems operate under the following constraints:
 
-1. Maximize concurrency by be eliminating long-duration locks
+1. **Maximize concurrency** by be eliminating long-duration locks
    * Rows cannot be locked (pessimistically) on read, _in case_ they are updated
-2. Database design cannot tolerate new `VersionNumber` columns
+2. **No special columns**, such as  `VersionNumber`
    * Database design is often constrained by other applications, or by internal standards
-3. Minimize network traffic and keep client coding simple
+3. **Minimize network traffic** and keep client coding simple
    * E.g., unwieldy to send all "old" values back  
 
 &nbsp;
@@ -67,7 +67,7 @@ SQLAlchemy provides the `loaded_as_persistent` [event](https://docs.sqlalchemy.o
 
 #### 3. The rules engine supports generic `before_logic`
 
-This enables us to check the row compare `CheckSum` values before updates; see [`logic/declare_logic](/logic/declare_logic.py).  Note such logic has access to the about-to-be-updated row, and the old-row.
+This enables us to check the row compare `CheckSum` values before updates; see [`logic/declare_logic](https://github.com/ApiLogicServer/demo/blob/main/logic/declare_logic.py).  Note such logic has access to the about-to-be-updated row, and the old-row.
 
 &nbsp;
 
@@ -92,7 +92,7 @@ You can configure optimistic locking when you create projects, with the followin
 You can override the created `opt_locking` on server startup:
 
 * by updating the Config file, and
-* by using the `OPT_LOCKING`  Env variable.
+* by using the `OPT_LOCKING` Env variable.
 
 The options are the same as shown in the table above.
 
@@ -102,16 +102,16 @@ Note the env variables can be set on your IDE Run Configurations.
 
 ### Processing Overview
 
-The approach is summarized in the table below.  See the the code in [`api/system/opt_locking/opt_locking.py`](/api/system/opt_locking/opt_locking.py) for details.
+The approach is summarized in the table below.  See the the code in [`api/system/opt_locking/opt_locking.py`](https://github.com/ApiLogicServer/demo/blob/main/api/system/opt_locking/opt_locking.py) for details.
 
 &nbsp;
 
 | Phase | Responsibility | Action | Notes |
 |:-----|:-------|:-------|:----|
-| Design Time | API Logic Server CLI | Declare <`opt_locking_attr`> as a `@jsonapi_attr` | `models.py` - json_attr |
-| Runtime - Read | System | Compute Checksum | `opt_locking#loaded_as` (setup from from api_logic_server_run.py) |
-| Runtime - Call Patch | Custom App Code<br>Admin App | Return as-read-Checksum | See examples below |
-| Runtime - Process Patch | System | Compare CheckSums: as-read vs. current | `opt_locking#opt_locking_patch`, via `logic/declare_logic.py`: generic before event |
+| Design Time | **System** | Declare <`opt_locking_attr`> as a `@jsonapi_attr` | Project creation (CLI) builds `models.py` with @json_attr |
+| Runtime - Read | **System** | Compute Checksum | `opt_locking#loaded_as` (setup from from api_logic_server_run.py) |
+| Runtime - Call Patch | **User** App Code,<br>Admin App | Return as-read-Checksum | See examples below |
+| Runtime - Process Patch | **System** | Compare CheckSums: as-read vs. current | `opt_locking#opt_locking_patch`, via `logic/declare_logic.py`: generic before event |
 
 &nbsp;
 
@@ -126,7 +126,7 @@ Use the `No Security` run config.
 
 &nbsp;
 
-### Category `Patch` missing S_Checksum lock passes (pre-update checksum, no Null)
+### Category `Patch` - Missing S_Checksum passes
 
 This should bypass optlock check and report "can't be x"
 
@@ -148,7 +148,7 @@ curl -X 'PATCH' \
 
 &nbsp;
 
-### Category `Patch` S_Checksum mismmatch lock caught (No Null)
+### Category `Patch` - Invalid S_Checksum raises exception
 
 This should fail "Sorry, row altered by another user..."
 
@@ -161,7 +161,7 @@ curl -X 'PATCH' \
   "data": {
     "attributes": {
       "Description": "x",
-      "S_CheckSum": "should fail"
+      "S_CheckSum": "Invalid S_Checksum raises exception"
     },
     "type": "Category",
     "id": "1"
@@ -171,9 +171,7 @@ curl -X 'PATCH' \
 
 &nbsp;
 
-### Category 9 `Patch` valid S_CheckSum passes (Null -> value)
-
-Category 9 has null Description...
+### Category 9 `Patch` valid S_CheckSum passes
 
 This should bypass optlock check and report "can't be x"
 
@@ -198,11 +196,9 @@ curl -X 'PATCH' \
 
 ### Order 10643 Set Shipped (from null)
 
-This case tests different attr ordering (per alias attribute), resulting in different checksums.  This is fixed in current versions by using same source for attr-list.
+This case tests different attribute ordering (per alias attribute), resulting in different checksums.
 
-This works, result shows the order.
-
-Be sure to replace the db.sqlite, since this changes it.
+Be sure to replace the db.sqlite after the test, since this changes it.
 
 ```
 curl -X 'PATCH' \
