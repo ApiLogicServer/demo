@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-#    This file initializes and starts the API Logic Server (v 09.01.10, July 13, 2023 09:05:25):
+#    This file initializes and starts the API Logic Server (v 09.01.12, July 16, 2023 17:51:56):
 #        $ python3 api_logic_server_run.py [--help]
 #
 #    Then, access the Admin App and API via the Browser, eg:  
@@ -95,7 +95,7 @@ if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
         app_logger.setLevel(logging.DEBUG)
         app_logger.debug(f'\nDEBUG level set from env\n')
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with CLI args: \n.. {args}\n')
-app_logger.info(f'Created July 13, 2023 09:05:25 at {str(current_path)}\n')
+app_logger.info(f'Created July 16, 2023 17:51:56 at {str(current_path)}\n')
 
 
 class ValidationErrorExt(ValidationError):
@@ -218,7 +218,8 @@ def api_logic_server_setup(flask_app, args):
             if Config.SECURITY_ENABLED:
                 from security import declare_security  # activate security
                 app_logger.info("..declare security - security/declare_security.py"
-                    + f' -- {len(database.authentication_models.metadata.tables)} authentication tables loaded')
+                    # not accurate: + f' -- {len(database.authentication_models.metadata.tables)}'
+                    + ' authentication tables loaded')
 
             from api.system.opt_locking import opt_locking
             from config import OptLocking
@@ -255,17 +256,18 @@ app_logger.debug(f"\nENV args: \n{args}\n\n")
 if args.verbose:
     app_logger.setLevel(logging.DEBUG)
     safrs.log.setLevel(logging.DEBUG)  # notset 0, debug 10, info 20, warn 30, error 40, critical 50
-if app_logger.getEffectiveLevel() == logging.DEBUG:
-    util.sys_info()
+if app_logger.getEffectiveLevel() <= logging.DEBUG:
+    util.sys_info(flask_app.config)
 app_logger.debug(f"\nENV args: \n{args}\n\n")
 
 api_logic_server_setup(flask_app, args)
 
-admin_events(flask_app = flask_app, swagger_host = args.swagger_host, swagger_port = args.swagger_port,
-    API_PREFIX=args.api_prefix, validation_error=ValidationError, http_type = args.http_scheme)
+# admin_events(flask_app = flask_app, swagger_host = args.swagger_host, swagger_port = args.swagger_port,
+#     API_PREFIX=args.api_prefix, validation_error=ValidationError, http_type = args.http_scheme)
+admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 09.01.10\n'
+    msg = f'API Logic Project loaded (not WSGI), version 09.01.12\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {args.flask_host} - may require refresh)\n'
     else:
@@ -287,7 +289,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 09.01.10\n'
+    msg = f'API Logic Project Loaded (WSGI), version 09.01.12\n'
     if is_docker():
         msg += f' (running from docker container at {args.flask_host} - may require refresh)\n'
     else:
