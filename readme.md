@@ -53,8 +53,8 @@ For information on Managing API Logic Projects, [click here](https://apilogicser
 
 | About                    | Info                               |
 |:-------------------------|:-----------------------------------|
-| Created                  | August 11, 2023 07:10:27                      |
-| API Logic Server Version | 09.02.03           |
+| Created                  | August 11, 2023 11:22:00                      |
+| API Logic Server Version | 09.02.04           |
 | Created in directory     | ../../../servers/demo |
 | API Name                 | api          |
 | Execution begins with    | `api_logic_server_run.py`          |
