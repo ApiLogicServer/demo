@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-#    This file initializes and starts the API Logic Server (v 09.01.12, July 16, 2023 17:51:56):
+#    This file initializes and starts the API Logic Server (v 09.02.03, August 11, 2023 07:10:27):
 #        $ python3 api_logic_server_run.py [--help]
 #
 #    Then, access the Admin App and API via the Browser, eg:  
@@ -31,7 +31,6 @@ except:
 from flask_sqlalchemy import SQLAlchemy
 import json
 from pathlib import Path
-from config import Config
 from config import Args
 
 def is_docker() -> bool:
@@ -45,6 +44,9 @@ def is_docker() -> bool:
 
 current_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(current_path)
+if is_docker():
+    sys.path.append(os.path.abspath('/home/api_logic_server'))
+
 project_dir = str(current_path)
 os.chdir(project_dir)  # so admin app can find images, code
 import util as util
@@ -62,6 +64,7 @@ project_name = os.path.basename(os.path.normpath(current_path))
 
 from typing import TypedDict
 import safrs  # fails without venv - see https://apilogicserver.github.io/Docs/Project-Env/
+from safrs import ValidationError, SAFRSBase, SAFRSAPI as _SAFRSAPI
 from logic_bank.logic_bank import LogicBank
 from logic_bank.exec_row_logic.logic_row import LogicRow
 from logic_bank.rule_type.constraint import Constraint
@@ -71,9 +74,26 @@ import socket
 import warnings
 from flask import Flask, redirect, send_from_directory, send_file
 from safrs import ValidationError, SAFRSBase, SAFRSAPI
-from ui.admin.admin_loader import admin_events
+import ui.admin.admin_loader as AdminLoader
 from security.system.authentication import configure_auth
 import database.multi_db as multi_db
+
+
+class SAFRSAPI(_SAFRSAPI):
+    """
+    Extends SAFRSAPI to handle client_uri
+
+    Args:
+        _SAFRSAPI (_type_): _description_
+    """
+
+    def __init__(self, *args, **kwargs):
+        client_uri = kwargs.pop('client_uri', None)
+        if client_uri:
+            kwargs['port'] = None
+            kwargs['host'] = client_uri
+        super().__init__(*args, **kwargs)
+
 
 
 # ==================================
@@ -95,7 +115,7 @@ if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
         app_logger.setLevel(logging.DEBUG)
         app_logger.debug(f'\nDEBUG level set from env\n')
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with CLI args: \n.. {args}\n')
-app_logger.info(f'Created July 16, 2023 17:51:56 at {str(current_path)}\n')
+app_logger.info(f'Created August 11, 2023 07:10:27 at {str(current_path)}\n')
 
 
 class ValidationErrorExt(ValidationError):
@@ -119,7 +139,7 @@ class ValidationErrorExt(ValidationError):
 #   - Setup API, Logic, Security, Optimistic Locking 
 # ==========================================================
 
-def api_logic_server_setup(flask_app, args):
+def api_logic_server_setup(flask_app: Flask, args: Args):
     """
     API Logic Server Setup
 
@@ -176,7 +196,7 @@ def api_logic_server_setup(flask_app, args):
 
             with open(Path(current_path).joinpath('security/system/custom_swagger.json')) as json_file:
                 custom_swagger = json.load(json_file)
-            safrs_api = SAFRSAPI(flask_app, app_db= db, host=args.swagger_host, port=args.swagger_port, 
+            safrs_api = SAFRSAPI(flask_app, app_db= db, host=args.swagger_host, port=args.swagger_port, client_uri=args.client_uri,
                                  prefix = args.api_prefix, custom_swagger=custom_swagger)
 
             db = safrs.DB  # valid only after is initialized, above
@@ -210,12 +230,12 @@ def api_logic_server_setup(flask_app, args):
             app_logger.info(f'Declare   API - api/expose_api_models, endpoint for each table on {args.swagger_host}:{args.swagger_port}, customizing...')
             customize_api.expose_services(flask_app, safrs_api, project_dir, swagger_host=args.swagger_host, PORT=args.port)  # custom services
 
-            if Config.SECURITY_ENABLED:
+            if args.security_enabled:
                 configure_auth(flask_app, database, method_decorators)
 
             multi_db.expose_db_apis(flask_app, session, safrs_api, method_decorators)
 
-            if Config.SECURITY_ENABLED:
+            if args.security_enabled:
                 from security import declare_security  # activate security
                 app_logger.info("..declare security - security/declare_security.py"
                     # not accurate: + f' -- {len(database.authentication_models.metadata.tables)}'
@@ -223,7 +243,7 @@ def api_logic_server_setup(flask_app, args):
 
             from api.system.opt_locking import opt_locking
             from config import OptLocking
-            if Config.OPT_LOCKING == OptLocking.IGNORED.value:
+            if args.opt_locking == OptLocking.IGNORED.value:
                 app_logger.info("\nOptimistic Locking: ignored")
             else:
                 opt_locking.opt_locking_setup(session)
@@ -248,7 +268,7 @@ flask_app.config.from_object("config.Config")
 app_logger.debug(f"\nConfig args: \n{args}")                    # config file (e.g., db uri's)
 
 args.get_cli_args(dunder_name=__name__, args=args)
-app_logger.debug(f"\nCLI args: \n{args}")
+app_logger.debug(f"\nCLI args: \n{args}")                       # api_logic_server_run cl args
 
 flask_app.config.from_prefixed_env(prefix="APILOGICPROJECT")    # env overrides (e.g., docker)
 app_logger.debug(f"\nENV args: \n{args}\n\n")
@@ -262,12 +282,10 @@ app_logger.debug(f"\nENV args: \n{args}\n\n")
 
 api_logic_server_setup(flask_app, args)
 
-# admin_events(flask_app = flask_app, swagger_host = args.swagger_host, swagger_port = args.swagger_port,
-#     API_PREFIX=args.api_prefix, validation_error=ValidationError, http_type = args.http_scheme)
-admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
+AdminLoader.admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 09.01.12\n'
+    msg = f'API Logic Project loaded (not WSGI), version 09.02.03\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {args.flask_host} - may require refresh)\n'
     else:
@@ -289,7 +307,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 09.01.12\n'
+    msg = f'API Logic Project Loaded (WSGI), version 09.02.03\n'
     if is_docker():
         msg += f' (running from docker container at {args.flask_host} - may require refresh)\n'
     else:

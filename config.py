@@ -52,7 +52,15 @@ def is_docker() -> bool:
     return path_result
 
 class Config:
-    """Set Flask configuration from .env file."""
+    """
+    
+    Set default Flask configuration from .env file.
+
+    These values are overridden by api_logic_server_run cli args, and APILOGICPROJECT_ env variables.
+
+    Code should therefore access these ONLY as described in Args, below.
+    
+    """
 
     # Project Creation Defaults (overridden from args, env variables)
     CREATED_API_PREFIX = "/api"
@@ -139,14 +147,25 @@ class Config:
 
 
 class Args():
-    """ accessors for Config values 
+    """ 
+    
+    Singleton class - typed accessors for flask_app.config values.
 
-    The source of truth is the flask_app.config
+    The source of truth is the flask_app.config.
 
-    Set from created values, overwritten from cli args, then APILOGICPROJECT_ env variables
+    Set from created values in Config, overwritten by cli args, then APILOGICPROJECT_ env variables.
 
-    This class provides **typed** access
+    This class provides **typed** access.
     """
+
+    values = None
+
+    def __new__(cls, flask_app):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(Args, cls).__new__(cls)
+        return cls.instance
+
+
     def __init__(self, flask_app):
         """
 
@@ -174,8 +193,9 @@ class Args():
         self.verbose = False
         self.create_and_run = False
 
+
     @property
-    def port(self):
+    def port(self) -> str:
         """ port to which flask will be bound """
         return self.flask_app.config["PORT"]  # if "PORT" in self.flask_app.config else self.__port
     
@@ -185,7 +205,7 @@ class Args():
 
 
     @property
-    def swagger_port(self):
+    def swagger_port(self) -> str:
         """ swagger port (eg, 443 for codespaces) """
         return self.flask_app.config["SWAGGER_PORT"]
     
@@ -195,7 +215,7 @@ class Args():
 
 
     @property
-    def swagger_host(self):
+    def swagger_host(self) -> str:
         """ ip clients use to access API """
         return self.flask_app.config["SWAGGER_HOST"]
     
@@ -205,7 +225,7 @@ class Args():
 
 
     @property
-    def flask_host(self):
+    def flask_host(self) -> str:
         """ ip to which flask will be bound """
         return self.flask_app.config["FLASK_HOST"]
     
@@ -215,7 +235,67 @@ class Args():
 
 
     @property
-    def api_prefix(self):
+    def security_enabled(self) -> bool:
+        """ is security enabled.  Stored as string, returned as bool """
+        return_security = self.flask_app.config["SECURITY_ENABLED"]
+        if isinstance(return_security, str):
+            security = return_security.lower()  # type: ignore
+            if security in ["false", "no"]:  # NO SEC
+                return_security = False
+            else:
+                return_security = True
+        return return_security
+
+    
+    @security_enabled.setter
+    def security_enabled(self, a):
+        self.flask_app.config["SECURITY_ENABLED"] = a
+
+
+    @property
+    def security_provider(self):
+        """ class for auth provider (unused - see auth_provider) """
+        return self.flask_app.config["SECURITY_PROVIDER"]
+
+    
+    @security_provider.setter
+    def security_provider(self, a):
+        raise Exception("Sorry, security_provider must be specified in the Config class")
+
+
+    @property
+    def api_logic_server_home(self):
+        """ location of ApiLogicServer-src (for admin_loader) """
+        return self.flask_app.config["APILOGICSERVER_HOME"]
+
+    
+    @api_logic_server_home.setter
+    def api_logic_server_home(self, a):
+        self.flask_app.config["APILOGICSERVER_HOME"] = a
+
+
+    @property
+    def opt_locking(self) -> str:
+        """ values: ignored, optional, required """
+        return self.flask_app.config["OPT_LOCKING"]
+
+    
+    @opt_locking.setter
+    def opt_locking(self, a):
+        opt_locking_export = self.flask_app.config('OPT_LOCKING')  # type: ignore # type: str
+        opt_locking = opt_locking_export.lower()  # type: ignore
+        if opt_locking in OptLocking.list():
+            OPT_LOCKING = opt_locking
+        else:
+            print(f'\n{__name__}: Invalid APILOGICPROJECT_OPT_LOCKING.\n..Valid values are {OptLocking.list()}')
+            exit(1)
+        app_logger.debug(f'Opt Locking .. overridden from env variable: {OPT_LOCKING}')
+
+        self.flask_app.config["OPT_LOCKING"] = a
+
+
+    @property
+    def api_prefix(self) -> str:
         """ uri node for this project (e.g, /api) """
         return self.flask_app.config["API_PREFIX"]
     
@@ -225,7 +305,7 @@ class Args():
 
 
     @property
-    def http_scheme(self):
+    def http_scheme(self) -> str:
         """ http or https """
         return self.flask_app.config["HTTP_SCHEME"]
     
@@ -268,6 +348,7 @@ class Args():
     def __str__(self) -> str:
         rtn =  f'.. flask_host: {self.flask_host}, port: {self.port}, \n'\
                f'.. swagger_host: {self.swagger_host}, swagger_port: {self.swagger_port}, \n'\
+               f'.. client_uri: {self.client_uri}, \n'\
                f'.. http_scheme: {self.http_scheme}, api_prefix: {self.api_prefix}, \n'\
                f'.. | verbose: {self.verbose}, create_and_run: {self.create_and_run}'
         return rtn
