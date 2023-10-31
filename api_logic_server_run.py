@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-#    This file initializes and starts the API Logic Server (v 09.04.00, October 01, 2023 06:25:33):
+#    This file initializes and starts the API Logic Server (v 09.04.11, October 31, 2023 11:11:01):
 #        $ python3 api_logic_server_run.py [--help]
 #
 #    Then, access the Admin App and API via the Browser, eg:  
@@ -117,7 +117,7 @@ if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
         app_logger.setLevel(logging.DEBUG)
         app_logger.debug(f'\nDEBUG level set from env\n')
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with CLI args: \n.. {args}\n')
-app_logger.info(f'Created October 01, 2023 06:25:33 at {str(current_path)}\n')
+app_logger.info(f'Created October 31, 2023 11:11:01 at {str(current_path)}\n')
 
 
 class ValidationErrorExt(ValidationError):
@@ -200,11 +200,15 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
         db_logger = logging.getLogger('sqlalchemy')
         db_log_level = db_logger.getEffectiveLevel()
         safrs_init_logger = logging.getLogger("safrs.safrs_init")
+        authorization_logger = logging.getLogger('security.system.authorization')
+        authorization_log_level = authorization_logger.getEffectiveLevel()
         do_hide_chatty_logging = True and not args.verbose
+        # eg, system startup health check: read on API and relationship - hide many log entries
         if do_hide_chatty_logging and app_logger.getEffectiveLevel() <= logging.INFO:
             safrs.log.setLevel(logging.WARN)  # notset 0, debug 10, info 20, warn 30, error 40, critical 50
             db_logger.setLevel(logging.WARN)
             safrs_init_logger.setLevel(logging.WARN)
+            authorization_logger.setLevel(logging.WARN)
 
         multi_db.bind_dbs(flask_app)
 
@@ -288,6 +292,8 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
         
         safrs.log.setLevel(safrs_log_level)
         db_logger.setLevel(db_log_level)
+        authorization_logger.setLevel(authorization_log_level)
+
 
 
 # ==================================
@@ -315,6 +321,15 @@ app_logger.debug(f"\nENV args: \n{args}\n\n")
 if args.verbose:
     app_logger.setLevel(logging.DEBUG)
     safrs.log.setLevel(logging.DEBUG)  # notset 0, debug 10, info 20, warn 30, error 40, critical 50
+    authentication_logger = logging.getLogger('security.system.authentication')
+    authentication_logger.setLevel(logging.DEBUG)
+    authorization_logger = logging.getLogger('security.system.authorization')
+    authorization_logger.setLevel(logging.DEBUG)
+    auth_provider_logger = logging.getLogger('security.authentication_provider.sql.auth_provider')
+    auth_provider_logger.setLevel(logging.DEBUG)
+    # sqlachemy_logger = logging.getLogger('sqlalchemy.engine')
+    # sqlachemy_logger.setLevel(logging.DEBUG)
+
 if app_logger.getEffectiveLevel() <= logging.DEBUG:
     util.sys_info(flask_app.config)
 app_logger.debug(f"\nENV args: \n{args}\n\n")
@@ -325,7 +340,7 @@ api_logic_server_setup(flask_app, args)
 AdminLoader.admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 09.04.00\n'
+    msg = f'API Logic Project loaded (not WSGI), version 09.04.11\n'
     msg += f'.. startup message: {start_up_message}\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {args.flask_host} - may require refresh)\n'
@@ -348,7 +363,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 09.04.00\n'
+    msg = f'API Logic Project Loaded (WSGI), version 09.04.11\n'
     msg += f'.. startup message: {start_up_message}\n'
 
     if is_docker():

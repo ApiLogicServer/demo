@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 # Alter this file per your database maintenance policy
 #    See https://apilogicserver.github.io/Docs/Project-Rebuild/#rebuilding
 #
-# Created:  October 01, 2023 06:25:32
+# Created:  October 31, 2023 11:11:01
 # Database: sqlite:////Users/val/dev/ApiLogicServer/ApiLogicServer-dev/servers/demo/database/db.sqlite
 # Dialect:  sqlite
 #
@@ -19,7 +19,7 @@ from sqlalchemy.ext.declarative import declarative_base
 #
 #   Search:
 #     manual  - illustrates you can make manual changes to models.py
-#     example - more complex cases (explore in database/db_debug.py)
+#     example - more complex cases (explore in database/db_debug/db_debug.py)
 ########################################################################################################################
 
 from safrs import SAFRSBase
@@ -145,6 +145,7 @@ class Department(SAFRSBase, Base):
     Id = Column(Integer, primary_key=True)
     DepartmentId = Column(ForeignKey('Department.Id'))
     DepartmentName = Column(String(100))
+    SecurityLevel = Column(Integer, server_default=text("0"))
 
     # parent relationships (access parent) -- example: self-referential
     # .. https://docs.sqlalchemy.org/en/20/orm/self_referential.html

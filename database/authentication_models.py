@@ -14,7 +14,7 @@ from flask_jwt_extended import create_access_token
 # Alter this file per your database maintenance policy
 #    See https://apilogicserver.github.io/Docs/Project-Rebuild/#rebuilding
 #
-# Created:  October 01, 2023 06:25:33
+# Created:  October 31, 2023 11:11:01
 # Database: sqlite:////Users/val/dev/ApiLogicServer/ApiLogicServer-dev/servers/demo/database/authentication_db.sqlite
 # Dialect:  sqlite
 #
@@ -74,12 +74,11 @@ class User(SAFRSBase, Baseauthentication, db.Model, UserMixin):  # type: ignore
     __bind_key__ = 'authentication'
 
     name = Column(String(128))
-    notes = Column(Text)
     client_id = Column(Integer)
     id = Column(String(64), primary_key=True, unique=True)
     username = Column(String(128))
-    email = Column(String(128))
     password_hash = Column(String(200))
+    region = Column(String(32))
     allow_client_generated_ids = True
 
     # parent relationships (access parent)
