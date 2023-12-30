@@ -24,19 +24,15 @@ class Roles():
     renter = "renter"           # r1
     manager = "manager"         # u2, sam
     sales="sales"               # s1
+    customer="customer"         # ALFKI, ANATR
 
-                                # user_id = 1 -- aneu
-                                        # many customers
-                                        # 1 category
-                                # user_id = 2 -- u2, sam, s1, r1
-                                        # 3 customers
-                                        # 3 categories
+                                # user_id = 1 -- aneu              many customers, 1 category
+                                # user_id = 2 -- u2, sam, s1, r1   3    customers, 3 categories
 
 DefaultRolePermission(to_role = Roles.tenant, can_read=True, can_delete=True)
 DefaultRolePermission(to_role = Roles.renter, can_read=True, can_delete=False)
 DefaultRolePermission(to_role = Roles.manager, can_read=True, can_delete=False)
 DefaultRolePermission(to_role = Roles.sales, can_read=True, can_delete=False)
-
 
 GlobalFilter(   global_filter_attribute_name = "Client_id",  # try customers & categories for u1 vs u2
                 roles_not_filtered = ["sa"],
@@ -47,7 +43,6 @@ GlobalFilter(   global_filter_attribute_name = "SecurityLevel",  # filters Depar
                 roles_not_filtered = ["sa", "manager"],
                 filter = '{entity_class}.SecurityLevel == 0')
 
-
 #############################################
 # Observe: Filters are AND'd, Grants are OR'd 
 #############################################
@@ -55,14 +50,23 @@ GlobalFilter(   global_filter_attribute_name = "Region",  # sales see only Custo
                 roles_not_filtered = ["sa", "manager", "tenant", "renter"],  # ie, just sales
                 filter = '{entity_class}.Region == Security.current_user().region')
         
+GlobalFilter(   global_filter_attribute_name = "Discontinued",  # hide discontinued products
+                roles_not_filtered = ["sa", "manager"],         # except for admin and managers
+                filter = '{entity_class}.Discontinued == 0')
+        
+Grant(  on_entity = models.Customer,
+        to_role = Roles.customer,
+        filter = lambda : models.Customer.Id == Security.current_user().id,
+        filter_debug = "Id == Security.current_user().id")     # customers can only see their own account
+        
 Grant(  on_entity = models.Customer,
         to_role = Roles.sales,
         filter = lambda : models.Customer.CreditLimit > 300,
-        filter_debug = "CreditLimit > 300")     # this eliminates all rows, but...
+        filter_debug = "CreditLimit > 300")     # this eliminates all British Isle rows, but...
 
 Grant(  on_entity = models.Customer,
         to_role = Roles.sales,
-        filter = lambda : models.Customer.ContactName == "Mike",
+        filter = lambda : models.Customer.ContactName == "Mike",  # Mike sees his contacts
         filter_debug = "ContactName == Mike (see security/declare_security.py)")
 
 # so user s1 sees the CTWSR customer row, per the resulting where from 2 global filters and 2 Grants:

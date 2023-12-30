@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-#    This file initializes and starts the API Logic Server (v 09.04.11, October 31, 2023 11:11:01):
+#    This file initializes and starts the API Logic Server (v 10.00.08, December 29, 2023 16:07:53):
 #        $ python3 api_logic_server_run.py [--help]
 #
 #    Then, access the Admin App and API via the Browser, eg:  
@@ -79,6 +79,10 @@ from safrs import ValidationError, SAFRSBase, SAFRSAPI
 import ui.admin.admin_loader as AdminLoader
 from security.system.authentication import configure_auth
 import database.multi_db as multi_db
+import oracledb
+import integration.kafka.kafka_producer as kafka_producer
+import integration.kafka.kafka_consumer as kafka_consumer
+
 
 
 class SAFRSAPI(_SAFRSAPI):
@@ -117,7 +121,7 @@ if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
         app_logger.setLevel(logging.DEBUG)
         app_logger.debug(f'\nDEBUG level set from env\n')
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with CLI args: \n.. {args}\n')
-app_logger.info(f'Created October 31, 2023 11:11:01 at {str(current_path)}\n')
+app_logger.info(f'Created December 29, 2023 16:07:53 at {str(current_path)}\n')
 
 
 class ValidationErrorExt(ValidationError):
@@ -238,6 +242,9 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
             safrs_api = SAFRSAPI(flask_app, app_db= db, host=args.swagger_host, port=args.swagger_port, client_uri=args.client_uri,
                                  prefix = args.api_prefix, custom_swagger=custom_swagger)
 
+            if os.getenv('APILOGICSERVER_ORACLE_THICK'):
+                oracledb.init_oracle_client(lib_dir=os.getenv('APILOGICSERVER_ORACLE_THICK'))
+
             db = safrs.DB  # valid only after is initialized, above
             session: Session = db.session
 
@@ -286,6 +293,9 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
                 app_logger.info("\nOptimistic Locking: ignored")
             else:
                 opt_locking.opt_locking_setup(session)
+
+            kafka_producer.kafka_producer()
+            kafka_consumer.kafka_consumer(safrs_api = safrs_api)
 
             SAFRSBase._s_auto_commit = False
             session.close()
@@ -340,7 +350,7 @@ api_logic_server_setup(flask_app, args)
 AdminLoader.admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 09.04.11\n'
+    msg = f'API Logic Project loaded (not WSGI), version 10.00.08\n'
     msg += f'.. startup message: {start_up_message}\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {args.flask_host} - may require refresh)\n'
@@ -363,7 +373,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 09.04.11\n'
+    msg = f'API Logic Project Loaded (WSGI), version 10.00.08\n'
     msg += f'.. startup message: {start_up_message}\n'
 
     if is_docker():
