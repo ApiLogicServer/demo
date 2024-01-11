@@ -28,7 +28,7 @@ from http import HTTPStatus
 
 from flask_jwt_extended import current_user
 
-from config import Args
+from config.config import Args
 authentication_provider = Args.security_provider
 
 security_logger = logging.getLogger(__name__)
@@ -283,14 +283,14 @@ class Grant:
             GrantSecurityException: _description_
         """
         
-        if not Args.security_enabled:  # FIXME check for use of Args.instance
+        if not Args.instance.security_enabled:
             return
         
         user = Security.current_user()
         sql_select = "not a SELECT"
         if orm_execute_state is not None:
             sql_select = str(orm_execute_state.statement)
-            security_logger.debug(f"\nSQL Select -- Begin authorization processing for {sql_select}")   
+            security_logger.info(f"\nSQL Select -- Begin authorization processing for {sql_select}")   
         
         can_read = False
         can_insert = False
@@ -401,7 +401,7 @@ class Grant:
         sql_select = "not a SELECT"
         if orm_execute_state is not None:
             sql_select = str(orm_execute_state.statement)
-        security_logger.debug(f"SQL Select: End authorization processing for: {sql_select}")   
+        security_logger.info(f"SQL Select: End authorization processing for: {sql_select}")   
 
 
 
@@ -418,7 +418,7 @@ class Grant:
         
             self.logic_row = logic_row
         
-            if Args.security_enabled: 
+            if Args.instance.security_enabled: 
                 entity_name = self.logic_row.name 
                 #select is handled by orm_execution_state
                 crud_state = ""
@@ -442,7 +442,7 @@ def receive_do_orm_execute(orm_execute_state: ORMExecuteState ):
     """
 
     if (
-        Args.security_enabled
+        Args.instance.security_enabled
         and orm_execute_state.is_select
         and not orm_execute_state.is_column_load
         and not orm_execute_state.is_relationship_load

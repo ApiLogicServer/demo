@@ -2,8 +2,9 @@
 
 # intended for use in portal cli - not to be run on your local machine.
 
-projectname="basicdemo"  # lower case, only
-resourcegroup="basicdemo_rg"
+projectname="apilogicserver_project"  # project directory
+resourcename="demo"  # lower case, only
+resourcegroup="demo_rg"
 dockerrepositoryname="apilogicserver"  # change this to your DockerHub Repository
 githubaccount="apilogicserver"         # change this to your GitHub account
 version="1.0.0"
@@ -13,8 +14,8 @@ version="1.0.0"
 # which uses: https://github.com/Azure-Samples/multicontainerwordpress
 
 # login to Azure Portal CLI (substitute your github account for apilogicserver)
-# git clone https://github.com/apilogicserver/basicdemo.git
-# cd basicdemo
+# git clone https://github.com/apilogicserver/demo.git
+# cd demo
 # sh devops/docker-compose-dev-azure/azure-deploy.sh
 
 echo " "
@@ -26,9 +27,10 @@ else
   else
     echo "using arg overrides"
     projectname="$1"
-    githubaccount="$2"
-    dockerrepositoryname="$3"
-    resourcegroup="$4"
+    resourcename="$2"
+    githubaccount="$3"
+    dockerrepositoryname="$4"
+    resourcegroup="$5"
   fi
 fi
 
@@ -37,10 +39,10 @@ echo "Azure Deploy here - Azure Portal CLI commands to deploy project, 1.0"
 echo " "
 echo "Prereqs"
 echo "  1. You have published your project to GitHub: https://github.com/${githubaccount}/${projectname}.git"
-echo "  2. You have built your project image, and pushed it to DockerHub: ${dockerrepositoryname}/${projectname}"
+echo "  2. You have built your project image, and pushed it to DockerHub: ${dockerrepositoryname}/${resourcename}"
 echo " "
 echo "Steps performed on Azure Portal CLI to enable running these commands:"
-echo "  # we really only need the docker compose file"
+echo "  # we really only need the docker shell script"
 echo "  git clone https://github.com/$githubaccount/$projectname.git"
 echo "  cd classicmodels"
 echo " "
@@ -48,18 +50,16 @@ echo "Then, in Azure CLI:"
 echo "  sh devops/docker-compose-dev-azure/azure-deploy.sh [ . | args ]"
 echo "    . means use defaults:"
 echo "        ${dockerrepositoryname}/${projectname}:${version}"
-echo "    <args> = projectname githubaccount dockerrepositoryname resourcegroupname"
+echo "    <args> = projectname resourcename githubaccount dockerrepositoryname resourcegroupname"
 echo " "
 
 # security assumed; disable this if you are not using security
 if [ ! -f "./database/authentication_models.py" ] 
 then
-    echo "\nYou need to activate security first.  With you database running, ...\n" 
-    echo "ApiLogicServer add-auth --project_name=. --db_url=mysql+pymysql://root:p@localhost:3306/authdb, or..."
-    echo "ApiLogicServer add-auth --project_name=. --db_url=postgresql://postgres:p@localhost/authdb", or...
-    echo "ApiLogicServer add-auth --project_name=. --db_url=authdb"
+    echo "\nYou need to activate security first.  With mysql-container running...\n" 
+    echo "ApiLogicServer add-auth --project_name=. --db_url=mysql+pymysql://root:p@localhost:3306/authdb"
     echo "\nRebuild your image"
-    echo "\nThen, stop mysql/postgres containers to avoid port conflicts with services\n"
+    echo "\nThen, stop mysql-container\n"
     exit 1
 else
     echo "\n... security check complete\n"
@@ -75,8 +75,15 @@ az group create --name $resourcegroup --location "westus"
 # create service plan
 az appservice plan create --name myAppServicePlan --resource-group $resourcegroup --sku S1 --is-linux
 
-# create docker compose app
-az webapp create --resource-group $resourcegroup --plan myAppServicePlan --name basicdemo --multicontainer-config-type compose --multicontainer-config-file devops/docker-compose-dev-azure/docker-compose-dev-azure.yml
+# create single-container app
+az container create --resource-group $resourcegroup --name ${projectname} --image ${dockerrepositoryname}/${resourcename}:latest --dns-name-label ${resourcename} --ports 5656 --environment-variables 'VERBOSE'='True'  'APILOGICPROJECT_CLIENT_URI'='//{resourcename}.westus.azurecontainer.io:5656'
+
+# or, issue commands like these (fix the git repo name) directly in portal, or local az cli
+az group create --name demo_rg --location "westus"
+az appservice plan create --name myAppServicePlan --resource-group demo_rg --sku S1 --is-linux
+az container create --resource-group demo_rg --name demo --image apilogicserver/demo:latest --dns-name-label demo --ports 5656 --environment-variables 'VERBOSE'='True'  'APILOGICPROJECT_CLIENT_URI'='//demo.westus.azurecontainer.io:5656'
+
+# e.g.: az container create --resource-group aicustomerorders_rg --name aicustomerorders --image apilogicserver/aicustomerorders:latest --dns-name-label aicustomerorders --ports 5656 --environment-variables VERBOSE=True APILOGICPROJECT_CLIENT_URI=//aicustomerorders.westus.azurecontainer.io:5656
 
 set +x # reset echo
 
@@ -86,5 +93,6 @@ echo "   For Web server logging, select Storage to store logs on blob storage, o
 
 echo " "
 echo "Completed.  Browse to the app:" 
-echo "https://$projectname.azurewebsites.net"
+echo "http://$resourcename.westus.azurecontainer.io:5656"
+eche "e.g.: aicustomerorders.westus.azurecontainer.io:5656"
 echo " "

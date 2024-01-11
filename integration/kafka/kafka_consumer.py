@@ -1,17 +1,18 @@
 """
-
 Invoked at server start (api_logic_server_run.py)
 
-Connect to Kafka, if KAFKA_CONNECT specified in Config.py
+Listen/consume Kafka topis, if KAFKA_CONSUMER specified in Config.py
 
+Alter this file to add handlers for consuming kafka topics
 """
-from config import Args
+
+from config.config import Args
 from confluent_kafka import Producer, KafkaException, Consumer
 import signal
 import logging
 import json
 import socket
-from flask import Flask, redirect, send_from_directory, send_file
+import safrs
 from threading import Event
 from integration.system.FlaskKafka import FlaskKafka
 
@@ -19,18 +20,17 @@ from integration.system.FlaskKafka import FlaskKafka
 conf = None
 
 logger = logging.getLogger('integration.kafka')
-logger.debug("kafka_producer imported")
-pass
+logger.debug("kafka_consumer imported")
 
 
-def kafka_consumer(flask_app: Flask):
+def kafka_consumer(safrs_api: safrs.SAFRSAPI = None):
     """
     Called by api_logic_server_run to listen on kafka
 
-    Enabled by config.KAFKA_LISTEN
+    Enabled by config.KAFKA_CONSUMER
 
     Args:
-        app (Flask): flask_app
+        app (safrs.SAFRSAPI): safrs_api
     """
 
     if not Args.instance.kafka_consumer:
@@ -38,54 +38,23 @@ def kafka_consumer(flask_app: Flask):
         return
 
     conf = Args.instance.kafka_consumer
-    # conf = {'bootstrap.servers': 'localhost:9092', 'client.id': socket.gethostname()}
-    logger.debug(f'\nKafka producer configured')
-
-    
-    if "client.id" not in conf:
-        conf["client.id"] = socket.gethostname()
-    # conf = {'bootstrap.servers': 'localhost:9092', 'client.id': socket.gethostname()}
-    logger.debug(f'\nKafka producer starting')
-
+    #  eg, KAFKA_CONSUMER = '{"bootstrap.servers": "localhost:9092", "group.id": "als-default-group1"}'
+    logger.debug(f'\nKafka Consumer configured, starting')
 
     INTERRUPT_EVENT = Event()
 
-    bus = FlaskKafka(INTERRUPT_EVENT, conf)
+    bus = FlaskKafka(interrupt_event=INTERRUPT_EVENT, conf=conf, safrs_api=safrs_api)
     
-    bus.run()
+    bus.run()  # Kafka consumption, threading, handler annotations
 
-    logger.debug(f'Kafka Listener activated {bus}')
+    logger.debug(f'Kafka Listener thread activated {bus}')
 
-    def listen_kill_server():
-        signal.signal(signal.SIGTERM, bus.interrupted_process)
-        signal.signal(signal.SIGINT, bus.interrupted_process)
-        signal.signal(signal.SIGQUIT, bus.interrupted_process)
-        signal.signal(signal.SIGHUP, bus.interrupted_process)
-
+    '''   Your Code Goes Here
+    
+    Define topic handlers here, e.g.
 
     @bus.handle('order_shipping')
-    def test_topic_handler(msg):
-        print("consumed {} from order_shipping topic consumer".format(msg))
-        pass
+    def order_shipping(msg: object, safrs_api: safrs.SAFRSAPI):
 
-    # thanks:  https://dzone.com/articles/event-streaming-ai-amp-automation
-    from_article = False  # this blocks server from starting
-    if from_article:
-        consumer = Consumer(conf)
-        while True:
-            msg = consumer.poll(1.0)
-            logger.debug(f'consumer.poll gets: {msg}')
-            if msg is None:
-                continue
-            if msg.error():
-                pass  # Handle errors as needed pass
-            else:
-                message_data = msg.value() .decode("utf-8")
-                # Assuming the JSON message has a 'message_id' and 'message data' f
-                json_message = json.loads(message_data)
-                message_id = json_message.get('message_id')
-                message_data = json_message.get( 'message_data' )
-                # Create a new KafkaMessage instance and persist it to the database
-                print(f'Received and persisted message with ID: (message_id)')
-
+    '''
 

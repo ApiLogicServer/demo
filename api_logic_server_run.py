@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-#    This file initializes and starts the API Logic Server (v 09.06.04, December 15, 2023 12:06:52):
+#    This file initializes and starts the API Logic Server (v 10.01.12, January 11, 2024 10:39:10):
 #        $ python3 api_logic_server_run.py [--help]
 #
 #    Then, access the Admin App and API via the Browser, eg:  
@@ -32,7 +32,7 @@ except:
 from flask_sqlalchemy import SQLAlchemy
 import json
 from pathlib import Path
-from config import Args
+from config.config import Args
 
 def is_docker() -> bool:
     """ running docker?  dir exists: /home/api_logic_server """
@@ -50,7 +50,7 @@ if is_docker():
 
 project_dir = str(current_path)
 os.chdir(project_dir)  # so admin app can find images, code
-import util as util
+import api.system.api_utils as api_utils
 logic_logger_activate_debug = False
 """ True prints all rules on startup """
 
@@ -107,7 +107,7 @@ class SAFRSAPI(_SAFRSAPI):
 # ================================== 
 
 current_path = os.path.abspath(os.path.dirname(__file__))
-with open(f'{current_path}/logging.yml','rt') as f:  # see also logic/declare_logic.py
+with open(f'{current_path}/config/logging.yml','rt') as f:  # see also logic/declare_logic.py
         config=yaml.safe_load(f.read())
         f.close()
 logging.config.dictConfig(config)  # log levels: notset 0, debug 10, info 20, warn 30, error 40, critical 50
@@ -121,7 +121,7 @@ if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
         app_logger.setLevel(logging.DEBUG)
         app_logger.debug(f'\nDEBUG level set from env\n')
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with CLI args: \n.. {args}\n')
-app_logger.info(f'Created December 15, 2023 12:06:52 at {str(current_path)}\n')
+app_logger.info(f'Created January 11, 2024 10:39:10 at {str(current_path)}\n')
 
 
 class ValidationErrorExt(ValidationError):
@@ -288,14 +288,14 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
                     + ' authentication tables loaded')
 
             from api.system.opt_locking import opt_locking
-            from config import OptLocking
+            from config.config import OptLocking
             if args.opt_locking == OptLocking.IGNORED.value:
                 app_logger.info("\nOptimistic Locking: ignored")
             else:
                 opt_locking.opt_locking_setup(session)
 
             kafka_producer.kafka_producer()
-            kafka_consumer.kafka_consumer(flask_app)
+            kafka_consumer.kafka_consumer(safrs_api = safrs_api)
 
             SAFRSBase._s_auto_commit = False
             session.close()
@@ -319,7 +319,8 @@ CORS(flask_app, resources=[{r"/api/*": {"origins": "*"}}],
 
 args = Args(flask_app=flask_app)                                # creation defaults
 
-flask_app.config.from_object("config.Config")
+import config.config as config
+flask_app.config.from_object(config.Config)
 app_logger.debug(f"\nConfig args: \n{args}")                    # config file (e.g., db uri's)
 
 args.get_cli_args(dunder_name=__name__, args=args)
@@ -341,7 +342,7 @@ if args.verbose:
     # sqlachemy_logger.setLevel(logging.DEBUG)
 
 if app_logger.getEffectiveLevel() <= logging.DEBUG:
-    util.sys_info(flask_app.config)
+    api_utils.sys_info(flask_app.config)
 app_logger.debug(f"\nENV args: \n{args}\n\n")
 validate_db_uri(flask_app)
 
@@ -350,7 +351,7 @@ api_logic_server_setup(flask_app, args)
 AdminLoader.admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 09.06.04\n'
+    msg = f'API Logic Project loaded (not WSGI), version 10.01.12\n'
     msg += f'.. startup message: {start_up_message}\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {args.flask_host} - may require refresh)\n'
@@ -373,7 +374,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 09.06.04\n'
+    msg = f'API Logic Project Loaded (WSGI), version 10.01.12\n'
     msg += f'.. startup message: {start_up_message}\n'
 
     if is_docker():
