@@ -10,20 +10,22 @@ from typing import Any, Optional, Tuple
 from sqlalchemy.orm import object_mapper
 from typing_extensions import Self  # from typing import Self  # requires python 3.11
 import logging
+from logic_bank.exec_row_logic.logic_row import LogicRow
 
 logger = logging.getLogger('integration.kafka')
 
+# version 1.1
 
-def json_to_entities(from_row: str or object, to_row):
+def json_to_entities(from_row: str | object, to_row):
     """
     Transform json object to SQLAlchemy rows, for save & logic
 
-    This and rows_to_dict() do not provide attribute renaming or lookups.
+    This and rows_to_dict() do not provide attribute renaming, joins or lookups.
     * In most cases, extend RowDictMapper, which provides these services.
     * See: https://apilogicserver.github.io/Docs/Integration-Map/
     * And: https://apilogicserver.github.io/Docs/Sample-Integration/
 
-        :param from_row: json service payload: dict - e.g., Order and OrderDetailsList
+    :param from_row: json service payload: dict - e.g., Order and OrderDetailsList
     :param to_row: instantiated mapped object (e.g., Order)
     :return: updates to_row with contents of from_row (recursively for lists)
     """
@@ -62,6 +64,7 @@ def json_to_entities(from_row: str or object, to_row):
                         child_from = from_row[each_attr_name]
                         for each_child_from in child_from:
                             child_class = each_attr.entity.class_
+                            # #als add child to parent list
                             # eachOrderDetail = OrderDetail(); order.OrderDetailList.append(eachOrderDetail)
                             child_to = child_class()  # instance of child (e.g., OrderDetail)
                             json_to_entities(each_child_from, child_to)
@@ -77,8 +80,13 @@ def rows_to_dict(result: flask_sqlalchemy.BaseQuery) -> list:
     """
     Converts SQLAlchemy result (mapped or raw) to dict array of un-nested rows
 
+    This does not provide attribute renaming, joins or lookups.
+    * In most cases, extend RowDictMapper, which provides these services.
+    * See: https://apilogicserver.github.io/Docs/Integration-Map/
+    * And: https://apilogicserver.github.io/Docs/Sample-Integration/
+
     Args:
-        result (object): list of serializable objects (e.g., dict)
+        result (object): query result
 
     Returns:
         list of rows as dicts
@@ -108,6 +116,7 @@ class RowDictMapper():
 
     def __init__(self
             , model_class: type[DefaultMeta] | None
+            , logic_row: LogicRow = None 
             , alias: str = ""
             , role_name: str = ""
             , fields: list[tuple[Column, str] | Column] = []
@@ -176,7 +185,12 @@ class RowDictMapper():
         row_as_dict = {}
         for each_field in custom_endpoint.fields:
             if isinstance(each_field, tuple):
-                row_as_dict[each_field[1]] = getattr(row, each_field[0].name)
+                value = "unknown"
+                if isinstance(each_field[0], sqlalchemy.orm.attributes.InstrumentedAttribute):
+                    value = getattr(row, each_field[0].name)
+                else:
+                    value = each_field[0]
+                row_as_dict[each_field[1]] = value
             else:
                 if isinstance(each_field, str):
                     logger.info("Coding error - you need to use TUPLE for attr/alias")

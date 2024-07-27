@@ -1,12 +1,29 @@
 Feature: Place Order
 
+  Scenario: Order Made Not Ready
+     Given Customer Account: ALFKI
+      When Ready Flag is Reset
+      Then Logic Decreases Balance
+
+  Scenario: Order Made Ready
+     Given Customer Account: ALFKI
+      When Ready Flag is Set
+      Then Logic Increases Balance
+
   Scenario: Good Order Custom Service
      Given Customer Account: ALFKI
       When Good Order Placed
       Then Logic adjusts Balance (demo: chain up)
       Then Logic adjusts Products Reordered
       Then Logic sends email to salesrep
+      Then Logic sends kafka message
       Then Logic adjusts aggregates down on delete order
+
+
+  Scenario: Bad Ship of Empty Order
+     Given Customer Account: ALFKI
+      When Order Shipped with no Items
+      Then Rejected per Do Not Ship Empty Orders
 
 
   Scenario: Bad Order Custom Service

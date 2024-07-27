@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-#    This file initializes and starts the API Logic Server (v 10.01.12, January 11, 2024 10:39:10):
+#    This file initializes and starts the API Logic Server (v 11.00.00, July 26, 2024 17:33:09):
 #        $ python3 api_logic_server_run.py [--help]
 #
 #    Then, access the Admin App and API via the Browser, eg:  
@@ -47,6 +47,11 @@ current_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(current_path)
 if is_docker():
     sys.path.append(os.path.abspath('/home/api_logic_server'))
+
+logic_alerts = True
+""" Set False to silence startup message """
+declare_logic_message = ""
+declare_security_message = "ALERT:  *** Security Not Enabled ***"
 
 project_dir = str(current_path)
 os.chdir(project_dir)  # so admin app can find images, code
@@ -121,7 +126,7 @@ if debug_value is not None:  # > export APILOGICPROJECT_DEBUG=True
         app_logger.setLevel(logging.DEBUG)
         app_logger.debug(f'\nDEBUG level set from env\n')
 app_logger.info(f'\nAPI Logic Project ({project_name}) Starting with CLI args: \n.. {args}\n')
-app_logger.info(f'Created January 11, 2024 10:39:10 at {str(current_path)}\n')
+app_logger.info(f'Created July 26, 2024 17:33:09 at {str(current_path)}\n')
 
 
 class ValidationErrorExt(ValidationError):
@@ -196,7 +201,7 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
 
     from sqlalchemy import exc as sa_exc
 
-    global logic_logger_activate_debug
+    global logic_logger_activate_debug, declare_logic_message, declare_security_message
 
     with warnings.catch_warnings():
 
@@ -221,7 +226,8 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
 
         def constraint_handler(message: str, constraint: Constraint, logic_row: LogicRow):
             """ format LogicBank constraint exception for SAFRS """
-            if constraint.error_attributes:
+            if constraint is not None and hasattr(constraint, 'error_attributes'):
+
                 detail = {"model": logic_row.name, "error_attributes": constraint.error_attributes}
             else:
                 detail = {"model": logic_row.name}
@@ -260,6 +266,7 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
             from database import customize_models
 
             from logic import declare_logic
+            declare_logic_message = declare_logic.declare_logic_message
             logic_logger = logging.getLogger('logic_logger')
             logic_logger_level = logic_logger.getEffectiveLevel()
             if logic_logger_activate_debug == False:
@@ -284,8 +291,9 @@ def api_logic_server_setup(flask_app: Flask, args: Args):
             if args.security_enabled:
                 from security import declare_security  # activate security
                 app_logger.info("..declare security - security/declare_security.py"
-                    # not accurate: + f' -- {len(database.authentication_models.metadata.tables)}'
+                    # not accurate: + f' -- {len(database.database_discovery.authentication_models.metadata.tables)}'
                     + ' authentication tables loaded')
+                declare_security_message = declare_security.declare_security_message
 
             from api.system.opt_locking import opt_locking
             from config.config import OptLocking
@@ -351,7 +359,7 @@ api_logic_server_setup(flask_app, args)
 AdminLoader.admin_events(flask_app = flask_app, args = args, validation_error = ValidationError)
 
 if __name__ == "__main__":
-    msg = f'API Logic Project loaded (not WSGI), version 10.01.12\n'
+    msg = f'API Logic Project loaded (not WSGI), version 11.00.00\n'
     msg += f'.. startup message: {start_up_message}\n'
     if is_docker():
         msg += f' (running from docker container at flask_host: {args.flask_host} - may require refresh)\n'
@@ -371,10 +379,18 @@ if __name__ == "__main__":
                 f'..Explore data and API at http_scheme://swagger_host:port {args.http_scheme}://{args.swagger_host}:{args.port}\n'
                 f'.... with flask_host: {args.flask_host}\n'
                 f'.... and  swagger_port: {args.swagger_port}')
+    if logic_alerts:
+        app_logger.info(f'\nAlert: These following are **Critical** to unlocking value:')
+        app_logger.info(f'.. see logic.declare_logic.py       -- {declare_logic_message}')
+        app_logger.info(f'.. see security.declare_security.py -- {declare_security_message}\n\n')
+
+        app_logger.info(f'*************************************************************************')    
+        app_logger.info(f'*   Startup Instructions: Open your Browser at: {args.http_scheme}://{args.swagger_host}:{args.port}   *')    
+        app_logger.info(f'*************************************************************************\n')    
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 10.01.12\n'
+    msg = f'API Logic Project Loaded (WSGI), version 11.00.00\n'
     msg += f'.. startup message: {start_up_message}\n'
 
     if is_docker():

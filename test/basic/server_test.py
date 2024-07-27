@@ -16,7 +16,14 @@ if len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1].__contains__("help")
     sys.exit()
 
 """
-    These are server tests for the default Sample DB.
+    These are re-runnable server tests for the default Sample DB (nw+).
+
+    They are a simple way to verify that the server is running, and that the logic is working.
+
+    In general, we recommend the behave tests, which define scenarios and automate a test suite.
+
+    Requires config/config.py to be SECURITY_ENABLED = False.
+        Use Behave tests to test with security enabled.
 
     These verify the following, and are useful coding examples of API Usage:
 """
@@ -115,7 +122,7 @@ def server_tests(host, port, version):
         test_name = "GET self-reln Dept-SubDepts"
         prt(f'\n\n\n{test_name}...\n\n', test_name)
         get_dept_uri = f'http://{host}:{port}/api/Department/2/?' \
-                       f'include=DepartmentList%2CEmployeeList%2CEmployeeList1%2CDepartment' \
+                       f'include=DepartmentList%2CEmployeeList%2CWorksForEmployeeList%2CDepartment' \
                        f'&fields%5BDepartment%5D=Id%2CDepartmentId%2CDepartmentName'
         r = requests.get(url=get_dept_uri)
         response_text = r.text

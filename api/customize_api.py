@@ -25,6 +25,9 @@ from integration.row_dict_maps.OrderB2B import OrderB2B
 
 app_logger = logging.getLogger("api_logic_server_app")
 
+# called by api_logic_server_run.py, to customize api (new end points, services).
+# separate from expose_api_models.py, to simplify merge if project recreated
+
 def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
     """ #als: Customize API - new end points for services 
     
@@ -54,17 +57,20 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
             * Illustrates: SQLAlchemy parent join fields
 
     2. CategoriesEndPoint get_cats() - swagger, row security
-            * Uses row_dict_mapper.rows_to_dict            (-> row.to_dict())
+            * Uses row_dict_mapper.rows_to_dict
 
     3. filters_cats() - model query with filters
             * Uses manual result creation (not util)
 
     4. raw_sql_cats() - raw sql (non-modeled objects)
-            * Uses row_dict_mapper.rows_to_dict            (-> iterate attributes)
+            * Uses row_dict_mapper.rows_to_dict
     
     """
 
     app_logger.debug("api/customize_api.py - expose custom services")
+
+    from api.api_discovery.auto_discovery import discover_services
+    discover_services(app, api, project_dir, swagger_host, PORT)
 
     api.expose_object(ServicesEndPoint)  # Swagger-visible services
     api.expose_object(CategoriesEndPoint)
@@ -127,7 +133,7 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
         
         1. SQLAlchemy row retrieval
         
-        2. IntegationService to reformat row as multi-table dict, and then json
+        2. RowDictMapper to reformat row as multi-table dict, and then json
 
         $(venv) ApiLogicServer login --user=admin --password=p
         $(venv) ApiLogicServer curl "http://localhost:5656/OrderShipping_Test?id=10643"
@@ -148,7 +154,42 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
 
 
     #########################################################
+    # Illustrate using SQLAlchemy for views
+    #########################################################
+
+    @app.route('/ProductDetails_View', methods=['GET','OPTIONS'])
+    @bypass_security()
+    def ProductDetails_View():
+        """
+        Illustrates: 
+        
+        * #als: "Raw" SQLAlchemy table queries (non-mapped objects), by manual code
+
+        $(venv) ApiLogicServer curl "http://localhost:5656/ProductDetails_View?id=1"
+
+        Returns:
+            json: response
+        """
+
+        request_id = request.args.get('id')
+        db = safrs.DB
+        session = db.session
+        Security.set_user_sa()  # an endpoint that requires no auth header (see also @bypass_security)
+        if request_id is None:
+            results = session.query(models.t_ProductDetails_View) 
+        else:                   # observe filter requires view_name.c
+            results = session.query(models.t_ProductDetails_View) \
+                    .filter(models.t_ProductDetails_View.c.Id == request_id)
+        return_result = []
+        for each_result in results:
+            row = { 'id': each_result.Id, 'name': each_result.ProductName}
+            return_result.append(row)
+        return jsonify({ "success": True, "result":  return_result})
+
+
+    #########################################################
     # Illustrate using SQLAlchemy in standard Flask endpoints
+    # #als: ORM database access
     #########################################################
 
     @app.route('/join_order')
@@ -157,7 +198,11 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
         """
         Illustrates: SQLAlchemy join fields, by manual code
 
-        Better: use IntegrationService (below)
+        Better: use RowDictMapper (see OrderB2B, below)
+
+        If you've not used ORMs like SQLAlchemy, this example illustrates a few key features:
+        * They return objects (not dicts), which enable code completion and type checking
+        * They provide accessors to related data (parent join fields, child data)
 
         $(venv) ApiLogicServer curl "http://localhost:5656/join_order?id=11077"
 
@@ -242,74 +287,6 @@ def expose_services(app, api, project_dir, swagger_host: str, PORT: str):
         return response
 
 
-    ###################
-    # Internal Services
-    ###################
-
-    @app.route('/server_log')
-    def server_log():
-        """
-        Used by test/*.py - enables client app to log msg into server's console log
-        """
-        return api_utils.server_log(request, jsonify)
-
-    
-    @app.route('/metadata')
-    def metadata():
-        """
-        Swagger provides typical API discovery.  This is for tool providers
-        requiring programmatic access to api definition, e.g., 
-        to drive artifact code generation.
-
-        Returns json for list of 1 / all resources, with optional attribute name/type, eg
-
-        curl -X GET "http://localhost:5656/metadata?resource=Category&include=attributes"
-
-        curl -X GET "http://localhost:5656/metadata?include=attributes"
-        """
-        import inspect
-        import sys
-        from sqlalchemy.ext.declarative import declarative_base
-
-        resource_name = request.args.get('resource')
-        include_attributes = False
-        include = request.args.get('include')
-        if include:
-            include_attributes = "attributes" in include
-        resource_list = []  # array of attributes[], name (so, the name is last...)
-        resource_objs = {}  # objects, named = resource_name
-
-        models_name = "database.models"
-        cls_members = inspect.getmembers(sys.modules["database.models"], inspect.isclass)
-        for each_cls_member in cls_members:
-            each_class_def_str = str(each_cls_member)
-            if (f"'{models_name}." in str(each_class_def_str) and
-                            "Ab" not in str(each_class_def_str)):
-                each_resource_name = each_cls_member[0]
-                each_resource_class = each_cls_member[1]
-                each_resource_mapper = each_resource_class.__mapper__
-                if resource_name is None or resource_name == each_resource_name:
-                    resource_object = {"name": each_resource_name}
-                    resource_list.append(resource_object)
-                    resource_objs[each_resource_name] = {}
-                    if include_attributes:
-                        attr_list = []
-                        for each_attr in each_resource_mapper.attrs:
-                            if not each_attr._is_relationship:
-                                try:
-                                    attribute_object = {"name": each_attr.key,
-                                                        "type": str(each_attr.expression.type)}
-                                except:
-                                    attribute_object = {"name": each_attr.key,
-                                                        "type": "unkown"}
-                                attr_list.append(attribute_object)
-                        resource_object["attributes"] = attr_list
-                        resource_objs[each_resource_name] = {"attributes": attr_list}
-        # pick the format you like
-        return_result = {"resources": resource_list}
-        return_result = {"resources": resource_objs}
-        return jsonify(return_result)
-
     @app.route('/stop')
     def stop():
         """
@@ -336,7 +313,7 @@ Illustrates #als: custom end point with swagger, RowDictMapper
 
 * Custom service - visible in swagger
 * Services *not* requiring authentication (contrast to CategoriesEndPoint, below)
-* Use OrderB2B (extends RowDictMapper) to map json to rows
+* Use OrderB2B (extends RowDictMapper) to map json to rows with aliasing, joins and lookups
 * Recall business logic is not in service, but encapsulated for reuse in logic/declare_logic.py
 """
 class ServicesEndPoint(safrs.JABase):
@@ -387,9 +364,10 @@ class ServicesEndPoint(safrs.JABase):
         db = safrs.DB         # Use the safrs.DB, not db!
         session = db.session  # sqlalchemy.orm.scoping.scoped_session
 
-        order_b2b_def = OrderB2B()
+        order_b2b_def = OrderB2B()  # a RowDictMapper
         request_dict_data = request.json["meta"]["args"]["order"]
         sql_alchemy_row = order_b2b_def.dict_to_row(row_dict = request_dict_data, session = session)
+        sql_alchemy_row.Ready = True
 
         session.add(sql_alchemy_row)
         return {"Thankyou For Your OrderB2B"}  # automatic commit, which executes transaction logic
@@ -425,7 +403,7 @@ class ServicesEndPoint(safrs.JABase):
         db = safrs.DB         # Use the safrs.DB, not db!
         session = db.session  # sqlalchemy.orm.scoping.scoped_session
 
-        order_id_def = OrderById()
+        order_id_def = OrderById()  # a RowDictMapper, but without joins, lookups
         request_dict_data = request.json["meta"]["args"]["order"]
         sql_alchemy_row = order_id_def.dict_to_row(row_dict = request_dict_data, session = session)
 
@@ -456,6 +434,7 @@ class ServicesEndPoint(safrs.JABase):
         db = safrs.DB         # Use the safrs.DB, not db!
         session = db.session  # sqlalchemy.orm.scoping.scoped_session
         new_order = models.Order()
+        new_order.Ready = True
         session.add(new_order)
 
         row_dict_mapper.json_to_entities(kwargs, new_order)  # generic function - any db object

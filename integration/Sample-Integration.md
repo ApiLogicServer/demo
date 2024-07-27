@@ -1,7 +1,7 @@
 ---
 title: Declarative Application Integration
 notes: gold docsite, 2100 words (goal: 1500)
-version: 10.0.1 from docsite, for readme
+version: 10.03.01 from docsite, for readme
 ---
 
 # Purpose
@@ -87,7 +87,9 @@ One command has created meaningful elements of our system:
 
 
 &nbsp;
-**Key Takeways -  Instant Self-Serve API - ad hoc integration - and Admin App**
+**Key Takeways - Instant Self-Serve API - ad hoc integration - and Admin App**
+&nbsp;
+
 ### API: Ad hoc Integration
 
 The system creates an API with end points for each table, providing filtering, sorting, pagination, optimistic locking and related data access.
@@ -145,7 +147,6 @@ ApiLogicServer add-cust
 
 **3. Enable and Start Kafka**
 
-
 <details markdown>
 
 <summary>Show me how</summary>
@@ -154,7 +155,7 @@ ApiLogicServer add-cust
 
 To enable Kafka:
 
-1. In `config.py`, find and comment out: `KAFKA_PRODUCER = None  # comment out to enable Kafka`
+1. In `conf/config.py`, find and comment out: `KAFKA_PRODUCER = None  # comment out to enable Kafka`
 
 2. Update your `etc/conf` to include the lines shown below (e.g., `sudo nano /etc/hosts`).
 
@@ -178,10 +179,36 @@ To enable Kafka:
 127.0.0.1 kubernetes.docker.internal
 # End of section
 ```
-3. Start Kafks: in a terminal window: `docker compose -f integration/kafka/dockercompose_start_kafka.yml up`
+3. If you already created the container, you can
+
+    1. Start it in the Docker Desktop, and
+    2. **Skip the next 2 steps;** otherwise...
+
+4. Start Kafka: in a terminal window: `docker compose -f integration/kafka/dockercompose_start_kafka.yml up`
+
+5. Create topic: in Docker: `kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3  --topic order_shipping`
+
+Here some useful Kafka commands:
+
+```bash
+# use Docker Desktop > exec, or docker exec -it broker1 bash 
+# in docker terminal: set prompt, delete, create, monnitor topic, list all topics
+# to clear topic, delete and create
+
+PS1="kafka > "  # set prompt
+
+kafka-topics.sh --bootstrap-server localhost:9092 --topic order_shipping --delete
+
+kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3  --topic order_shipping
+
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic order_shipping --from-beginning
+
+kafka-topics.sh --bootstrap-server localhost:9092 --list
+```
 
 </details>
 
+&nbsp;
 
 **4. Restart the server, login as `admin`**
 
@@ -218,7 +245,8 @@ Such logic (multi-table derivations and constraints) is a significant portion of
 
 
 &nbsp;
-**Key Takeways -  Logic: Multi-table Derivation and Constraint Rules, 40X More Concise**
+**Key Takeways - Logic: Multi-table Derivations and Constraint Rules, 40X More Concise**
+&nbsp;
 
 #### IDE: Declare and Debug
 
@@ -270,7 +298,9 @@ To see security in action:
 
 
 &nbsp;
-**Key Takeways -  Row-Level Security: Customers Filtered**
+**Key Takeways - Row-Level Security: Customers Filtered**
+&nbsp;
+
 #### Login, Row Filtering
 
 Declarative row-level security ensures that users see only the rows authorized for their roles.  Observe you now see only customer ALFKI, per the security declared below.  Note the console log at the bottom shows how the filter worked.
@@ -310,8 +340,10 @@ The main task here is to ***map*** a B2B payload onto our logic-enabled SQLAlche
 
 
 &nbsp;
-**Key Takeways -  Custom Endpoint - 7 lines of code**
-So, our custom endpoint required about 7 lines of code, along with the API specification on the right.  Note the logic is automatically factored out, and re-used for all APIs, both custom and self-serve.
+**Key Takeways - Custom Endpoint - 7 lines of code**
+&nbsp;
+
+    So, our custom endpoint required about 7 lines of code, along with the API specification on the right.  Note the logic is automatically factored out, and re-used for all APIs, both custom and self-serve.
 
 &nbsp;
 
@@ -338,8 +370,10 @@ Just as you can customize apis, you can complement rule-based logic using Python
 
 
 &nbsp;
-**Key Takeways -  Extensible Rules, Kafka Message Produced**
-Rule-based logic is extensible with Python, here producing a Kafka message with 20 lines of code.
+**Key Takeways - Extensible Rules, Kafka Message Produced**
+&nbsp;
+
+    Rule-based logic is extensible with Python, here producing a Kafka message with 20 lines of code.
 
 &nbsp;
 
@@ -371,7 +405,7 @@ To consume messages:
 
 **1. Enable Consumption**
 
-Shipping is pre-configured to enable message consumption with a setting in `config.py`:
+Shipping is pre-configured to enable message consumption with a setting in `conf/config.py`:
 
 ```python
 KAFKA_CONSUMER = '{"bootstrap.servers": "localhost:9092", "group.id": "als-default-group1", "auto.offset.reset":"smallest"}'
@@ -426,6 +460,7 @@ ApiLogicServer curl "'POST' 'http://localhost:5656/api/ServicesEndPoint/OrderB2B
     }
 }}}'
 ```
+
 &nbsp;
 
 # Summary

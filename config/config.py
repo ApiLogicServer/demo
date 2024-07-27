@@ -89,7 +89,7 @@ class Config:
     FLASK_APP = environ.get("FLASK_APP")
     FLASK_ENV = environ.get("FLASK_ENV")
     DEBUG = environ.get("DEBUG")
-
+            
     running_at = Path(__file__)
     project_abs_dir = running_at.parent.absolute()
 
@@ -104,7 +104,21 @@ class Config:
         SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
         app_logger.debug(f'.. overridden from env variable: {SQLALCHEMY_DATABASE_URI}')
 
-    SECURITY_ENABLED = True  # you must also: ApiLogicServer add-db --db_url=auth --bind_key=authentication
+
+    # KEYCLOAK Args
+    # https://apilogicserver.github.io/Docs/Security-Activation/
+    # als add-auth --provider-type=sql --db-url=
+    # als add-auth --provider-type=keycloak --db-url=localhost
+    # als add-auth --provider-type=keycloak --db-url=http://10.0.0.77:8080
+    kc_base = 'http://localhost:8080'  # e.g., 'http://localhost:8080'
+    ''' keycloak location '''
+    KEYCLOAK_REALM =  'kcals'
+    KEYCLOAK_BASE = f'{kc_base}/realms/{KEYCLOAK_REALM}'
+    KEYCLOAK_BASE_URL = f'{kc_base}'
+    KEYCLOAK_CLIENT_ID = 'alsclient'
+    ''' keycloak client id '''
+
+    SECURITY_ENABLED = True
     SECURITY_PROVIDER = None
     if os.getenv('SECURITY_ENABLED'):  # e.g. export SECURITY_ENABLED=true
         security_export = os.getenv('SECURITY_ENABLED')  # type: ignore # type: str
@@ -116,6 +130,7 @@ class Config:
         app_logger.debug(f'Security .. overridden from env variable: {SECURITY_ENABLED}')
     if SECURITY_ENABLED:
         from security.authentication_provider.sql.auth_provider import Authentication_Provider
+        # typically, authentication_provider is [ keycloak | sql ]
         SECURITY_PROVIDER = Authentication_Provider
         app_logger.debug(f'config.py - security enabled')
     else:
@@ -132,7 +147,8 @@ class Config:
         SQLALCHEMY_DATABASE_URI_AUTHENTICATION = os.getenv('SQLALCHEMY_DATABASE_URI_AUTHENTICATION')  # type: ignore # type: str
         app_logger.debug(f'.. overridden from env variable: SQLALCHEMY_DATABASE_URI_AUTHENTICATION')
 
-        # End Multi-Database URLs (from ApiLogicServer add-db...)
+
+    # End Multi-Database URLs (from ApiLogicServer add-db...)
 
     # SQLALCHEMY_ECHO = environ.get("SQLALCHEMY_ECHO")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -205,10 +221,47 @@ class Args():
         self.http_scheme = Config.CREATED_HTTP_SCHEME
         self.kafka_producer = Config.KAFKA_PRODUCER
         self.kafka_consumer = Config.KAFKA_CONSUMER
+        self.keycloak_base = Config.KEYCLOAK_BASE
+        self.keycloak_realm = Config.KEYCLOAK_REALM
+        self.keycloak_base_url = Config.KEYCLOAK_BASE_URL
+        self.keycloak_client_id = Config.KEYCLOAK_CLIENT_ID
 
         self.verbose = False
         self.create_and_run = False
 
+    # KEYCLOAK ARGS
+    @property
+    def keycloak_realm(self) -> str:
+        return self.flask_app.config["KEYCLOAK_REALM"]
+    
+    @keycloak_realm.setter
+    def keycloak_realm(self, realm):
+        self.flask_app.config["KEYCLOAK_REALM"] = realm
+
+    @property
+    def keycloak_base(self) -> str:
+        return self.flask_app.config["KEYCLOAK_BASE"]
+    
+    @keycloak_base.setter
+    def keycloak_base(self, base):
+        self.flask_app.config["KEYCLOAK_BASE"] = base
+        
+    @property
+    def keycloak_base_url(self) -> str:
+        return self.flask_app.config["KEYCLOAK_BASE_URL"]
+    
+    @keycloak_base_url.setter
+    def keycloak_base_url(self, base):
+        self.flask_app.config["KEYCLOAK_BASE_URL"] = base
+        
+    @property
+    def keycloak_client_id(self) -> str:
+        return self.flask_app.config["KEYCLOAK_CLIENT_ID"]
+    
+    @keycloak_client_id.setter
+    def keycloak_client_id(self, base):
+        self.flask_app.config["KEYCLOAK_CLIENT_ID"] = base
+        
 
     @property
     def port(self) -> str:
@@ -282,7 +335,7 @@ class Args():
     @property
     def api_logic_server_home(self):
         """ location of ApiLogicServer-src (for admin_loader) """
-        return self.flask_app.config["APILOGICSERVER_HOME"]
+        return self.flask_app.config["APILOGICSERVER_HOME"] if 'APILOGICSERVER_HOME' in self.flask_app.config else None 
 
     
     @api_logic_server_home.setter
@@ -365,7 +418,12 @@ class Args():
         """ kafka connect string """
         if "KAFKA_PRODUCER" in self.flask_app.config:
             if self.flask_app.config["KAFKA_PRODUCER"] is not None:
-                return json.loads(self.flask_app.config["KAFKA_PRODUCER"])
+                value = self.flask_app.config["KAFKA_PRODUCER"]
+                if isinstance(value, dict):
+                    pass  # eg, from VSCode Run Config: "APILOGICPROJECT_KAFKA_PRODUCER": "{\"bootstrap.servers\": \"localhost:9092\"}",
+                else:
+                    value = json.loads(self.flask_app.config["KAFKA_PRODUCER"])
+                return value
         return None
     
     @kafka_producer.setter

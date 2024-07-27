@@ -1,5 +1,6 @@
 # coding: utf-8
-from sqlalchemy import Boolean, Column, DECIMAL, Date, Double, ForeignKey, ForeignKeyConstraint, Integer, String, Text, text
+from sqlalchemy import DECIMAL, DateTime  # API Logic Server GenAI assist
+from sqlalchemy import Boolean, Column, DECIMAL, Date, Double, ForeignKey, ForeignKeyConstraint, Integer, String, Table, Text, text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -9,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 # Alter this file per your database maintenance policy
 #    See https://apilogicserver.github.io/Docs/Project-Rebuild/#rebuilding
 #
-# Created:  January 11, 2024 10:39:10
+# Created:  July 26, 2024 17:33:09
 # Database: sqlite:////Users/val/dev/ApiLogicServer/ApiLogicServer-dev/servers/demo/database/db.sqlite
 # Dialect:  sqlite
 #
@@ -21,8 +22,8 @@ from sqlalchemy.ext.declarative import declarative_base
 #     manual  - illustrates you can make manual changes to models.py
 #     example - more complex cases (explore in database/db_debug/db_debug.py)
 ########################################################################################################################
-
-from safrs import SAFRSBase
+ 
+from database.system.SAFRSBaseX import SAFRSBaseX
 from flask_login import UserMixin
 import safrs, flask_sqlalchemy
 from safrs import jsonapi_attr
@@ -43,7 +44,7 @@ from sqlalchemy.dialects.sqlite import *
 
 
 
-class Category(SAFRSBase, Base):
+class Category(SAFRSBaseX, Base):
     __tablename__ = 'CategoryTableNameTest'
     _s_collection_name = 'Category'  # type: ignore
     __bind_key__ = 'None'
@@ -70,7 +71,7 @@ class Category(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Customer(SAFRSBase, Base):
+class Customer(SAFRSBaseX, Base):
     __tablename__ = 'Customer'
     _s_collection_name = 'Customer'  # type: ignore
     __bind_key__ = 'None'
@@ -111,7 +112,7 @@ class Customer(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class CustomerDemographic(SAFRSBase, Base):
+class CustomerDemographic(SAFRSBaseX, Base):
     __tablename__ = 'CustomerDemographic'
     _s_collection_name = 'CustomerDemographic'  # type: ignore
     __bind_key__ = 'None'
@@ -137,7 +138,7 @@ class CustomerDemographic(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Department(SAFRSBase, Base):
+class Department(SAFRSBaseX, Base):
     __tablename__ = 'Department'
     _s_collection_name = 'Department'  # type: ignore
     __bind_key__ = 'None'
@@ -153,8 +154,8 @@ class Department(SAFRSBase, Base):
 
     # child relationships (access children)
     DepartmentList : Mapped[List["Department"]] = relationship(back_populates="Department")
-    EmployeeList : Mapped[List["Employee"]] = relationship(foreign_keys='[Employee.OnLoanDepartmentId]', back_populates="Department")
-    EmployeeList1 : Mapped[List["Employee"]] = relationship(foreign_keys='[Employee.WorksForDepartmentId]', back_populates="Department1")
+    EmployeeList : Mapped[List["Employee"]] = relationship(foreign_keys='[Employee.OnLoanDepartmentId]', back_populates="OnLoanDepartment")
+    WorksForEmployeeList : Mapped[List["Employee"]] = relationship(foreign_keys='[Employee.WorksForDepartmentId]', back_populates="WorksForDepartment")
 
     @jsonapi_attr
     def _check_sum_(self):  # type: ignore [no-redef]
@@ -169,7 +170,7 @@ class Department(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Location(SAFRSBase, Base):
+class Location(SAFRSBaseX, Base):
     __tablename__ = 'Location'
     _s_collection_name = 'Location'  # type: ignore
     __bind_key__ = 'None'
@@ -197,7 +198,7 @@ class Location(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Product(SAFRSBase, Base):
+class Product(SAFRSBaseX, Base):
     __tablename__ = 'Product'
     _s_collection_name = 'Product'  # type: ignore
     __bind_key__ = 'None'
@@ -232,7 +233,27 @@ class Product(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Region(SAFRSBase, Base):
+t_ProductDetails_View = Table(
+    'ProductDetails_View', metadata,
+    Column('Id', Integer),
+    Column('ProductName', String(8000)),
+    Column('SupplierId', Integer),
+    Column('CategoryId', Integer),
+    Column('QuantityPerUnit', String(8000)),
+    Column('UnitPrice', DECIMAL),
+    Column('UnitsInStock', Integer),
+    Column('UnitsOnOrder', Integer),
+    Column('ReorderLevel', Integer),
+    Column('Discontinued', Integer),
+    Column('UnitsShipped', Integer),
+    Column('CategoryName_ColumnName', String(8000)),
+    Column('CategoryDescription', String(8000)),
+    Column('SupplierName', String(8000)),
+    Column('SupplierRegion', String(8000))
+)
+
+
+class Region(SAFRSBaseX, Base):
     __tablename__ = 'Region'
     _s_collection_name = 'Region'  # type: ignore
     __bind_key__ = 'None'
@@ -257,7 +278,7 @@ class Region(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class SampleDBVersion(SAFRSBase, Base):
+class SampleDBVersion(SAFRSBaseX, Base):
     __tablename__ = 'SampleDBVersion'
     _s_collection_name = 'SampleDBVersion'  # type: ignore
     __bind_key__ = 'None'
@@ -282,7 +303,7 @@ class SampleDBVersion(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Shipper(SAFRSBase, Base):
+class Shipper(SAFRSBaseX, Base):
     __tablename__ = 'Shipper'
     _s_collection_name = 'Shipper'  # type: ignore
     __bind_key__ = 'None'
@@ -308,7 +329,7 @@ class Shipper(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Supplier(SAFRSBase, Base):
+class Supplier(SAFRSBaseX, Base):
     __tablename__ = 'Supplier'
     _s_collection_name = 'Supplier'  # type: ignore
     __bind_key__ = 'None'
@@ -343,7 +364,7 @@ class Supplier(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Territory(SAFRSBase, Base):
+class Territory(SAFRSBaseX, Base):
     __tablename__ = 'Territory'
     _s_collection_name = 'Territory'  # type: ignore
     __bind_key__ = 'None'
@@ -371,7 +392,7 @@ class Territory(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Union(SAFRSBase, Base):
+class Union(SAFRSBaseX, Base):
     __tablename__ = 'Union'
     _s_collection_name = 'Union'  # type: ignore
     __bind_key__ = 'None'
@@ -397,7 +418,7 @@ class Union(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Employee(SAFRSBase, Base):
+class Employee(SAFRSBaseX, Base):
     __tablename__ = 'Employee'
     _s_collection_name = 'Employee'  # type: ignore
     __bind_key__ = 'None'
@@ -428,9 +449,9 @@ class Employee(SAFRSBase, Base):
 
     # parent relationships (access parent) -- example: multiple join paths
     # .. https://docs.sqlalchemy.org/en/20/orm/join_conditions.html#handling-multiple-join-paths
-    Department : Mapped["Department"] = relationship(foreign_keys='[Employee.OnLoanDepartmentId]', back_populates=("EmployeeList"))
+    OnLoanDepartment : Mapped["Department"] = relationship(foreign_keys='[Employee.OnLoanDepartmentId]', back_populates=("EmployeeList"))
     Union : Mapped["Union"] = relationship(back_populates=("EmployeeList"))
-    Department1 : Mapped["Department"] = relationship(foreign_keys='[Employee.WorksForDepartmentId]', back_populates=("EmployeeList1"))
+    WorksForDepartment : Mapped["Department"] = relationship(foreign_keys='[Employee.WorksForDepartmentId]', back_populates=("WorksForEmployeeList"))
 
     # child relationships (access children)
     EmployeeAuditList : Mapped[List["EmployeeAudit"]] = relationship(back_populates="Employee")
@@ -450,7 +471,7 @@ class Employee(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class EmployeeAudit(SAFRSBase, Base):
+class EmployeeAudit(SAFRSBaseX, Base):
     __tablename__ = 'EmployeeAudit'
     _s_collection_name = 'EmployeeAudit'  # type: ignore
     __bind_key__ = 'None'
@@ -462,6 +483,9 @@ class EmployeeAudit(SAFRSBase, Base):
     FirstName = Column(String)
     EmployeeId = Column(ForeignKey('Employee.Id'))
     CreatedOn = Column(Text)
+    UpdatedOn = Column(Text)
+    CreatedBy = Column(Text)
+    UpdatedBy = Column(Text)
 
     # parent relationships (access parent)
     Employee : Mapped["Employee"] = relationship(back_populates=("EmployeeAuditList"))
@@ -481,7 +505,7 @@ class EmployeeAudit(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class EmployeeTerritory(SAFRSBase, Base):
+class EmployeeTerritory(SAFRSBaseX, Base):
     __tablename__ = 'EmployeeTerritory'
     _s_collection_name = 'EmployeeTerritory'  # type: ignore
     __bind_key__ = 'None'
@@ -510,7 +534,7 @@ class EmployeeTerritory(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class Order(SAFRSBase, Base):
+class Order(SAFRSBaseX, Base):
     __tablename__ = 'Order'
     _s_collection_name = 'Order'  # type: ignore
     __bind_key__ = 'None'
@@ -562,7 +586,7 @@ class Order(SAFRSBase, Base):
     S_CheckSum = _check_sum_
 
 
-class OrderDetail(SAFRSBase, Base):
+class OrderDetail(SAFRSBaseX, Base):
     __tablename__ = 'OrderDetail'
     _s_collection_name = 'OrderDetail'  # type: ignore
     __bind_key__ = 'None'
