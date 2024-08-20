@@ -10,17 +10,11 @@ from sqlalchemy.ext.declarative import declarative_base
 # Alter this file per your database maintenance policy
 #    See https://apilogicserver.github.io/Docs/Project-Rebuild/#rebuilding
 #
-# Created:  July 26, 2024 17:33:09
-# Database: sqlite:////Users/val/dev/ApiLogicServer/ApiLogicServer-dev/servers/demo/database/db.sqlite
+# Created:  August 20, 2024 12:48:24
+# Database: sqlite:////Users/val/dev/ApiLogicServer/ApiLogicServer-dev/build_and_test/ApiLogicServer/ApiLogicProject/database/db.sqlite
 # Dialect:  sqlite
 #
 # mypy: ignore-errors
-#
-# Sample Database (Northwind) -- https://apilogicserver.github.io/Docs/Sample-Database/
-#
-#   Search:
-#     manual  - illustrates you can make manual changes to models.py
-#     example - more complex cases (explore in database/db_debug/db_debug.py)
 ########################################################################################################################
  
 from database.system.SAFRSBaseX import SAFRSBaseX
@@ -148,8 +142,7 @@ class Department(SAFRSBaseX, Base):
     DepartmentName = Column(String(100))
     SecurityLevel = Column(Integer, server_default=text("0"))
 
-    # parent relationships (access parent) -- example: self-referential
-    # .. https://docs.sqlalchemy.org/en/20/orm/self_referential.html
+    # parent relationships (access parent)
     Department : Mapped["Department"] = relationship(remote_side=[Id], back_populates=("DepartmentList"))
 
     # child relationships (access children)
@@ -447,8 +440,7 @@ class Employee(SAFRSBaseX, Base):
     UnionId = Column(ForeignKey('Union.Id'))
     Dues : DECIMAL = Column(DECIMAL)
 
-    # parent relationships (access parent) -- example: multiple join paths
-    # .. https://docs.sqlalchemy.org/en/20/orm/join_conditions.html#handling-multiple-join-paths
+    # parent relationships (access parent)
     OnLoanDepartment : Mapped["Department"] = relationship(foreign_keys='[Employee.OnLoanDepartmentId]', back_populates=("EmployeeList"))
     Union : Mapped["Union"] = relationship(back_populates=("EmployeeList"))
     WorksForDepartment : Mapped["Department"] = relationship(foreign_keys='[Employee.WorksForDepartmentId]', back_populates=("WorksForEmployeeList"))

@@ -16,9 +16,9 @@
       
       <o-text-input #TerritoryDescription attr="TerritoryDescription" label=" Territory Description*" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
       
-      <o-text-input #Id attr="Id" label="Id" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
+      <o-text-input #Id attr="Id" label="Id" enabled="yes" required="yes" fxFlex="20%" class="form-field"></o-text-input>
       
-      <o-integer-input #RegionId attr="RegionId" label="RegionId" type="integer" editable="yes" required="yes" ></o-integer-input>
+      <o-integer-input #RegionId attr="RegionId" label="RegionId" type="integer" editable="no" required="yes" ></o-integer-input>
       
     </div>
   </o-row>
@@ -33,13 +33,12 @@
         entity="EmployeeTerritory" 
         keys="Id"
         parent-keys="TerritoryId:Id"
-        columns="Id;TerritoryId;EmployeeId"  
+        columns="Id;EmployeeId;TerritoryId"  
         horizontal-scroll="yes"
         detail-form-route="EmployeeTerritory" 
         edit-form-route="EmployeeTerritory"
-        visible-columns="Id;TerritoryId;EmployeeId"  
+        visible-columns="Id;EmployeeId;TerritoryId"  
         sort-columns="Id" 
-        detail-button-in-row="yes"
         query-rows="25" 
         quick-filter="yes"
         row-height="medium" 
@@ -54,16 +53,7 @@
         edition-mode="dblclick" 
         horizontal-scroll="yes" class="fill-form">
         
-          <o-table-column #Id attr="Id" title=" Id*" editable="yes" required="no" content-align="left"></o-table-column>
-        
-          <o-table-column attr="TerritoryId" title="Territory">
-    <o-table-cell-renderer-service attr="TerritoryId" 
-        service="Territory" entity="TerritoryType" columns="Id;TerritoryDescription"
-        parent-keys="Id:TerritoryId"
-        value-column="TerritoryDescription" keys="TerritoryId"
-        visible-columns="TerritoryDescription" separator=" - " width="680px">
-    </o-table-cell-renderer-service>
-</o-table-column>
+          <o-table-column #Id attr="Id" title=" Id*" editable="no" required="yes" content-align="left"></o-table-column>
         
           <o-table-column attr="EmployeeId" title="Employee">
     <o-table-cell-renderer-service attr="EmployeeId" 
@@ -71,6 +61,15 @@
         parent-keys="Id:EmployeeId"
         value-column="LastName" keys="EmployeeId"
         visible-columns="LastName" separator=" - " width="680px">
+    </o-table-cell-renderer-service>
+</o-table-column>
+        
+          <o-table-column attr="TerritoryId" title="Territory">
+    <o-table-cell-renderer-service attr="TerritoryId" 
+        service="Territory" entity="TerritoryType" columns="Id;TerritoryDescription"
+        parent-keys="Id:TerritoryId"
+        value-column="TerritoryDescription" keys="TerritoryId"
+        visible-columns="TerritoryDescription" separator=" - " width="680px">
     </o-table-cell-renderer-service>
 </o-table-column>
         

@@ -6,9 +6,9 @@
             entity="Department" 
             title="{{ 'DEPARTMENT' | oTranslate }}"
             keys="Id"
-            columns="DepartmentName;DepartmentId;Id;SecurityLevel" 
+            columns="DepartmentName;DepartmentId;SecurityLevel;Id" 
             header-actions="R;D"
-            visible-columns="DepartmentName;DepartmentId;Id;SecurityLevel"  
+            visible-columns="DepartmentName;DepartmentId;SecurityLevel;Id"  
             sort-columns="DepartmentName" 
             query-rows="20" 
             quick-filter="yes"
@@ -22,7 +22,7 @@
             show-title="yes"
             export-button="yes">
             
-            <o-table-column #DepartmentName attr="DepartmentName" title=" Department Name*" editable="yes" required="no" content-align="left"></o-table-column>
+            <o-table-column #DepartmentName attr="DepartmentName" title=" Department Name*" editable="no" required="no" content-align="left"></o-table-column>
             
             <o-table-column attr="DepartmentId" title="Department">
     <o-table-cell-renderer-service attr="DepartmentId" 
@@ -33,9 +33,9 @@
     </o-table-cell-renderer-service>
 </o-table-column>
             
-            <o-table-column #Id attr="Id" title="Id" type="integer" editable="yes" required="no" content-align="center"></o-table-column>
+            <o-table-column #SecurityLevel attr="SecurityLevel" title="SecurityLevel" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
-            <o-table-column #SecurityLevel attr="SecurityLevel" title="SecurityLevel" type="integer" editable="yes" required="no" content-align="center"></o-table-column>
+            <o-table-column #Id attr="Id" title="Id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
             <o-table-context-menu></o-table-context-menu>
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>

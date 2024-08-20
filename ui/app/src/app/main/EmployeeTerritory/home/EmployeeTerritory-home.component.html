@@ -6,9 +6,9 @@
             entity="EmployeeTerritory" 
             title="{{ 'EMPLOYEETERRITORY' | oTranslate }}"
             keys="Id"
-            columns="Id;TerritoryId;EmployeeId" 
+            columns="Id;EmployeeId;TerritoryId" 
             header-actions="R;D"
-            visible-columns="Id;TerritoryId;EmployeeId"  
+            visible-columns="Id;EmployeeId;TerritoryId"  
             sort-columns="Id" 
             query-rows="20" 
             quick-filter="yes"
@@ -22,16 +22,7 @@
             show-title="yes"
             export-button="yes">
             
-            <o-table-column #Id attr="Id" title=" Id*" editable="yes" required="no" content-align="left"></o-table-column>
-            
-            <o-table-column attr="TerritoryId" title="Territory">
-    <o-table-cell-renderer-service attr="TerritoryId" 
-        service="Territory" entity="TerritoryType" columns="Id;TerritoryDescription"
-        parent-keys="Id:TerritoryId"
-        value-column="TerritoryDescription" keys="TerritoryId"
-        visible-columns="TerritoryDescription" separator=" - " width="680px">
-    </o-table-cell-renderer-service>
-</o-table-column>
+            <o-table-column #Id attr="Id" title=" Id*" editable="no" required="yes" content-align="left"></o-table-column>
             
             <o-table-column attr="EmployeeId" title="Employee">
     <o-table-cell-renderer-service attr="EmployeeId" 
@@ -39,6 +30,15 @@
         parent-keys="Id:EmployeeId"
         value-column="LastName" keys="EmployeeId"
         visible-columns="LastName" separator=" - " width="680px">
+    </o-table-cell-renderer-service>
+</o-table-column>
+            
+            <o-table-column attr="TerritoryId" title="Territory">
+    <o-table-cell-renderer-service attr="TerritoryId" 
+        service="Territory" entity="TerritoryType" columns="Id;TerritoryDescription"
+        parent-keys="Id:TerritoryId"
+        value-column="TerritoryDescription" keys="TerritoryId"
+        visible-columns="TerritoryDescription" separator=" - " width="680px">
     </o-table-cell-renderer-service>
 </o-table-column>
             

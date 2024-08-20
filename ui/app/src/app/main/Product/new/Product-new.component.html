@@ -11,23 +11,23 @@ after-insert-mode="new" class="standalone-form-container" (onInsertMode)="onInse
       
         <o-text-input #QuantityPerUnit attr="QuantityPerUnit" label="QuantityPerUnit" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
       
-        <o-real-input #UnitPrice attr="UnitPrice" label="UnitPrice" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000" fxFlex="20%" class="form-field"></o-real-input>
+        <o-real-input #UnitPrice attr="UnitPrice" label="UnitPrice" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000000" fxFlex="20%" class="form-field"></o-real-input>
       
-        <o-integer-input #UnitsInStock attr="UnitsInStock" label="UnitsInStock" type="integer" editable="yes" required="yes" ></o-integer-input>
+        <o-integer-input #UnitsInStock attr="UnitsInStock" label="UnitsInStock" type="integer" editable="no" required="yes" ></o-integer-input>
       
-        <o-integer-input #UnitsOnOrder attr="UnitsOnOrder" label="UnitsOnOrder" type="integer" editable="yes" required="yes" ></o-integer-input>
+        <o-integer-input #UnitsOnOrder attr="UnitsOnOrder" label="UnitsOnOrder" type="integer" editable="no" required="yes" ></o-integer-input>
       
-        <o-integer-input #ReorderLevel attr="ReorderLevel" label="ReorderLevel" type="integer" editable="yes" required="yes" ></o-integer-input>
+        <o-integer-input #ReorderLevel attr="ReorderLevel" label="ReorderLevel" type="integer" editable="no" required="yes" ></o-integer-input>
       
-        <o-integer-input #Discontinued attr="Discontinued" label="Discontinued" type="integer" editable="yes" required="yes" ></o-integer-input>
+        <o-integer-input #Id attr="Id" label="Id" type="integer" editable="no" required="no" ></o-integer-input>
       
-        <o-integer-input #UnitsShipped attr="UnitsShipped" label="UnitsShipped" type="integer" editable="yes" required="no" ></o-integer-input>
+        <o-integer-input #SupplierId attr="SupplierId" label="SupplierId" type="integer" editable="no" required="yes" ></o-integer-input>
       
-        <o-integer-input #Id attr="Id" label="Id" type="integer" editable="yes" required="no" ></o-integer-input>
+        <o-integer-input #CategoryId attr="CategoryId" label="CategoryId" type="integer" editable="no" required="yes" ></o-integer-input>
       
-        <o-integer-input #SupplierId attr="SupplierId" label="SupplierId" type="integer" editable="yes" required="yes" ></o-integer-input>
+        <o-integer-input #Discontinued attr="Discontinued" label="Discontinued" type="integer" editable="no" required="yes" ></o-integer-input>
       
-        <o-integer-input #CategoryId attr="CategoryId" label="CategoryId" type="integer" editable="yes" required="yes" ></o-integer-input>
+        <o-integer-input #UnitsShipped attr="UnitsShipped" label="UnitsShipped" type="integer" editable="no" required="no" ></o-integer-input>
       
 </div>
 </o-row>

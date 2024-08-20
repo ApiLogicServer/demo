@@ -14,6 +14,13 @@ const routes: Routes = [
       }
     }
   },{
+    path: ':CloneFromOrder/Order', loadChildren: () => import('../Order/Order.module').then(m => m.OrderModule),
+    data: {
+        oPermission: {
+            permissionId: 'Order-detail-permissions'
+        }
+    }
+},{
     path: ':OrderId/OrderDetail', loadChildren: () => import('../OrderDetail/OrderDetail.module').then(m => m.OrderDetailModule),
     data: {
         oPermission: {

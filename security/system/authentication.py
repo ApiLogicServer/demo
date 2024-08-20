@@ -37,7 +37,7 @@ authentication_provider : Abstract_Authentication_Provider = config.Config.SECUR
 # note: direct config access is disparaged, but used since args not set up when this imported
 
 security_logger = logging.getLogger(__name__)
-access_token = None
+
 JWT_EXCLUDE = 'jwt_exclude'
 
 def jwt_required(*args, **kwargs):
@@ -79,13 +79,12 @@ def configure_auth(flask_app: Flask, database: object, method_decorators: list[o
     def login():
         """
         Post id/password, returns token to be placed in header of subsequent requests.
-
+        curl -X POST http://apilogicserver:5655/api/auth/login -d '{"username":"admin","password":"p"}'
         Returns:
             string: access token
         """
         if request.method == 'OPTIONS':
-            return jsonify(success=True)  
-        global access_token   
+            return jsonify(success=True)    
         try:   
             username = request.json.get("username", None)
             password = request.json.get("password", None)
@@ -106,11 +105,13 @@ def configure_auth(flask_app: Flask, database: object, method_decorators: list[o
                 password = s[1]
 
         user = authentication_provider.get_user(username, password)
-        if not user or not user.check_password(password):
+        if not user or not authentication_provider.check_password(user = user, password = password):
             return jsonify("Wrong username or password"), 401
-
+        
         access_token = create_access_token(identity=user)  # serialize and encode
-        return jsonify(access_token=access_token,sessionId=access_token)
+        from flask import g
+        g.access_token = access_token
+        return jsonify(access_token=access_token)
     
     @jwt.user_identity_loader
     def user_identity_lookup(user):

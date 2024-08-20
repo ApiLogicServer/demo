@@ -6,10 +6,10 @@
             entity="Category" 
             title="{{ 'CATEGORY' | oTranslate }}"
             keys="Id"
-            columns="CategoryName;Description;Client_id;Id" 
+            columns="CategoryName_ColumnName;Description;Id;Client_id" 
             header-actions="R;D"
-            visible-columns="CategoryName;Description;Client_id;Id"  
-            sort-columns="CategoryName" 
+            visible-columns="CategoryName_ColumnName;Description;Id;Client_id"  
+            sort-columns="CategoryName_ColumnName" 
             query-rows="20" 
             quick-filter="yes"
             row-height="medium" 
@@ -22,13 +22,13 @@
             show-title="yes"
             export-button="yes">
             
-            <o-table-column #CategoryName attr="CategoryName" title=" Category Name*" editable="yes" required="no" content-align="left"></o-table-column>
+            <o-table-column #CategoryName_ColumnName attr="CategoryName_ColumnName" title=" Category Name_ Column Name*" editable="no" required="no" content-align="left"></o-table-column>
             
-            <o-table-column #Description attr="Description" title="Description" editable="yes" required="no" content-align="left"></o-table-column>
+            <o-table-column #Description attr="Description" title="Description" editable="no" required="no" content-align="left"></o-table-column>
             
-            <o-table-column #Client_id attr="Client_id" title="Client_id" type="integer" editable="yes" required="no" content-align="center"></o-table-column>
+            <o-table-column #Id attr="Id" title="Id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
-            <o-table-column #Id attr="Id" title="Id" type="integer" editable="yes" required="no" content-align="center"></o-table-column>
+            <o-table-column #Client_id attr="Client_id" title="Client_id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
             <o-table-context-menu></o-table-context-menu>
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>

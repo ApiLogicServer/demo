@@ -10,6 +10,7 @@ export const SERVICE_CONFIG: Object ={ 'Category': { 'path': '/Category' }
 ,'OrderDetail': { 'path': '/OrderDetail' }
 ,'Product': { 'path': '/Product' }
 ,'Region': { 'path': '/Region' }
+,'SampleDBVersion': { 'path': '/SampleDBVersion' }
 ,'Shipper': { 'path': '/Shipper' }
 ,'Supplier': { 'path': '/Supplier' }
 ,'Territory': { 'path': '/Territory' }
