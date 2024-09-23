@@ -1,4 +1,3 @@
-<o-breadcrumb [form]="EmployeeTerritoryForm" label-columns="" separator=" "></o-breadcrumb>
 <o-form #EmployeeTerritoryForm attr="EmployeeTerritory_form_insert" service="EmployeeTerritory" entity="EmployeeTerritory" 
 keys="Id" fxLayout="column" show-header="yes" header-actions="I"
 horizontal-scroll="yes"
@@ -7,26 +6,7 @@ after-insert-mode="new" class="standalone-form-container" (onInsertMode)="onInse
 <o-row attr="row1" layout-align="start stretch">
   <div fxLayout="row wrap" fxLayoutAlign="start start" fxFlex fxLayoutGap="14px">
     
-        <o-text-input #Id attr="Id" label=" Id*" enabled="yes" required="yes" fxFlex="20%" class="form-field"></o-text-input>
-      
-        <o-list-picker 
-        attr="EmployeeId"
-        service="Employee" 
-        entity="EmployeeType"
-        fxFlex="30" 
-        query-on-init="no" 
-        query-on-bind="yes" 
-        required="yes" 
-        enabled="yes" 
-        filter="yes"
-        value-column="Id" 
-        value-column-type="INTEGER"  
-        keys="Id" 
-        columns="Id;EmployeeId;LastName" 
-        title="Employee"
-        visible-columns="Id;LastName" 
-        separator=" - " width="680px" class="form-field">
-</o-list-picker>
+        <o-text-input #Id attr="Id" label=" Id*" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
       
         <o-list-picker 
         attr="TerritoryId"
@@ -44,6 +24,25 @@ after-insert-mode="new" class="standalone-form-container" (onInsertMode)="onInse
         columns="Id;TerritoryId;TerritoryDescription" 
         title="Territory"
         visible-columns="Id;TerritoryDescription" 
+        separator=" - " width="680px" class="form-field">
+</o-list-picker>
+      
+        <o-list-picker 
+        attr="EmployeeId"
+        service="Employee" 
+        entity="EmployeeType"
+        fxFlex="30" 
+        query-on-init="no" 
+        query-on-bind="yes" 
+        required="yes" 
+        enabled="yes" 
+        filter="yes"
+        value-column="Id" 
+        value-column-type="INTEGER"  
+        keys="Id" 
+        columns="Id;EmployeeId;LastName" 
+        title="Employee"
+        visible-columns="Id;LastName" 
         separator=" - " width="680px" class="form-field">
 </o-list-picker>
       

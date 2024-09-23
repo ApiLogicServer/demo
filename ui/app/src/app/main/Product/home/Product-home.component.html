@@ -1,14 +1,14 @@
-<o-form attr="Product" mode="tab" title="{{ 'PRODUCT' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Product" mode="tab" title="PRODUCT">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="ProductTable" 
             service="Product" 
             entity="Product" 
-            title="{{ 'PRODUCT' | oTranslate }}"
+            title="PRODUCT"
             keys="Id"
-            columns="ProductName;QuantityPerUnit;UnitPrice;UnitsInStock;UnitsOnOrder;ReorderLevel;Id;SupplierId;CategoryId;Discontinued;UnitsShipped" 
+            columns="ProductName;QuantityPerUnit;UnitPrice;UnitsInStock;UnitsOnOrder;ReorderLevel;Discontinued;UnitsShipped;Id;SupplierId;CategoryId" 
             header-actions="R;D"
-            visible-columns="ProductName;QuantityPerUnit;UnitPrice;UnitsInStock;UnitsOnOrder;ReorderLevel;Id;SupplierId;CategoryId;Discontinued;UnitsShipped"  
+            visible-columns="ProductName;QuantityPerUnit;UnitPrice;UnitsInStock;UnitsOnOrder;ReorderLevel;Discontinued;UnitsShipped;Id;SupplierId;CategoryId"  
             sort-columns="ProductName" 
             query-rows="20" 
             quick-filter="yes"
@@ -34,18 +34,18 @@
             
             <o-table-column #ReorderLevel attr="ReorderLevel" title="ReorderLevel" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
             
+            <o-table-column #Discontinued attr="Discontinued" title="Discontinued" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
+            
+            <o-table-column #UnitsShipped attr="UnitsShipped" title="UnitsShipped" type="integer" editable="no" required="no" content-align="center"></o-table-column>
+            
             <o-table-column #Id attr="Id" title="Id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
             <o-table-column #SupplierId attr="SupplierId" title="SupplierId" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
             
             <o-table-column #CategoryId attr="CategoryId" title="CategoryId" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
             
-            <o-table-column #Discontinued attr="Discontinued" title="Discontinued" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
-            
-            <o-table-column #UnitsShipped attr="UnitsShipped" title="UnitsShipped" type="integer" editable="no" required="no" content-align="center"></o-table-column>
-            
             <o-table-context-menu></o-table-context-menu>
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

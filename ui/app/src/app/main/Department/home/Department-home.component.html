@@ -1,14 +1,14 @@
-<o-form attr="Department" mode="tab" title="{{ 'DEPARTMENT' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Department" mode="tab" title="DEPARTMENT">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="DepartmentTable" 
             service="Department" 
             entity="Department" 
-            title="{{ 'DEPARTMENT' | oTranslate }}"
+            title="DEPARTMENT"
             keys="Id"
-            columns="DepartmentName;DepartmentId;SecurityLevel;Id" 
+            columns="DepartmentName;DepartmentId;Id;SecurityLevel" 
             header-actions="R;D"
-            visible-columns="DepartmentName;DepartmentId;SecurityLevel;Id"  
+            visible-columns="DepartmentName;DepartmentId;Id;SecurityLevel"  
             sort-columns="DepartmentName" 
             query-rows="20" 
             quick-filter="yes"
@@ -33,12 +33,12 @@
     </o-table-cell-renderer-service>
 </o-table-column>
             
-            <o-table-column #SecurityLevel attr="SecurityLevel" title="SecurityLevel" type="integer" editable="no" required="no" content-align="center"></o-table-column>
-            
             <o-table-column #Id attr="Id" title="Id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
+            
+            <o-table-column #SecurityLevel attr="SecurityLevel" title="SecurityLevel" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
             <o-table-context-menu></o-table-context-menu>
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

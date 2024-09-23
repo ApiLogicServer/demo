@@ -1,10 +1,10 @@
-<o-form attr="CustomerDemographic" mode="tab" title="{{ 'CUSTOMERDEMOGRAPHIC' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="CustomerDemographic" mode="tab" title="CUSTOMERDEMOGRAPHIC">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="CustomerDemographicTable" 
             service="CustomerDemographic" 
             entity="CustomerDemographic" 
-            title="{{ 'CUSTOMERDEMOGRAPHIC' | oTranslate }}"
+            title="CUSTOMERDEMOGRAPHIC"
             keys="Id"
             columns="Id;CustomerDesc" 
             header-actions="R;D"
@@ -22,7 +22,7 @@
             show-title="yes"
             export-button="yes">
             
-            <o-table-column #Id attr="Id" title=" Id*" editable="no" required="yes" content-align="left"></o-table-column>
+            <o-table-column #Id attr="Id" title=" Id*" editable="no" required="no" content-align="left"></o-table-column>
             
             <o-table-column #CustomerDesc attr="CustomerDesc" title="CustomerDesc" editable="no" required="no" content-align="left"></o-table-column>
             
@@ -30,4 +30,4 @@
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

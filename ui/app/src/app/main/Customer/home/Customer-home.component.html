@@ -1,14 +1,14 @@
-<o-form attr="Customer" mode="tab" title="{{ 'CUSTOMER' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Customer" mode="tab" title="CUSTOMER">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="CustomerTable" 
             service="Customer" 
             entity="Customer" 
-            title="{{ 'CUSTOMER' | oTranslate }}"
+            title="CUSTOMER"
             keys="Id"
-            columns="CompanyName;ContactName;ContactTitle;Address;City;Region;PostalCode;Country;Phone;Fax;Balance;CreditLimit;OrderCount;UnpaidOrderCount;Id;Client_id" 
+            columns="Id;CompanyName;Balance;CreditLimit;OrderCount;UnpaidOrderCount;Client_id;ContactName;ContactTitle;Address;City;Region;PostalCode;Country;Phone;Fax" 
             header-actions="R;D"
-            visible-columns="CompanyName;ContactName;ContactTitle;Address;City;Region;PostalCode;Country;Phone;Fax;Balance;CreditLimit;OrderCount;UnpaidOrderCount;Id;Client_id"  
+            visible-columns="Id;CompanyName;Balance;CreditLimit;OrderCount;UnpaidOrderCount;Client_id;ContactName;ContactTitle;Address;City;Region;PostalCode;Country;Phone;Fax"  
             sort-columns="CompanyName" 
             query-rows="20" 
             quick-filter="yes"
@@ -22,7 +22,19 @@
             show-title="yes"
             export-button="yes">
             
+            <o-table-column #Id attr="Id" title="Id" editable="no" required="no" content-align="left"></o-table-column>
+            
             <o-table-column #CompanyName attr="CompanyName" title=" Company Name*" editable="no" required="no" content-align="left"></o-table-column>
+            
+            <o-table-column #Balance attr="Balance" title="Balance" type="currency" editable="no" required="no" currency-symbol="$" currency-symbol-position="left" thousand-separator=","decimal-separator="."></o-table-column>
+            
+            <o-table-column #CreditLimit attr="CreditLimit" title="CreditLimit" type="currency" editable="no" required="no" currency-symbol="$" currency-symbol-position="left" thousand-separator=","decimal-separator="."></o-table-column>
+            
+            <o-table-column #OrderCount attr="OrderCount" title="OrderCount" type="integer" editable="no" required="no" content-align="center"></o-table-column>
+            
+            <o-table-column #UnpaidOrderCount attr="UnpaidOrderCount" title="UnpaidOrderCount" type="integer" editable="no" required="no" content-align="center"></o-table-column>
+            
+            <o-table-column #Client_id attr="Client_id" title="Client_id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
             
             <o-table-column #ContactName attr="ContactName" title="ContactName" editable="no" required="no" content-align="left"></o-table-column>
             
@@ -42,20 +54,8 @@
             
             <o-table-column #Fax attr="Fax" title="Fax" editable="no" required="no" content-align="left"></o-table-column>
             
-            <o-table-column #Balance attr="Balance" title="Balance" type="currency" editable="no" required="no" currency-symbol="$" currency-symbol-position="left" thousand-separator=","decimal-separator="."></o-table-column>
-            
-            <o-table-column #CreditLimit attr="CreditLimit" title="CreditLimit" type="currency" editable="no" required="no" currency-symbol="$" currency-symbol-position="left" thousand-separator=","decimal-separator="."></o-table-column>
-            
-            <o-table-column #OrderCount attr="OrderCount" title="OrderCount" type="integer" editable="no" required="no" content-align="center"></o-table-column>
-            
-            <o-table-column #UnpaidOrderCount attr="UnpaidOrderCount" title="UnpaidOrderCount" type="integer" editable="no" required="no" content-align="center"></o-table-column>
-            
-            <o-table-column #Id attr="Id" title="Id" editable="no" required="yes" content-align="left"></o-table-column>
-            
-            <o-table-column #Client_id attr="Client_id" title="Client_id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
-            
             <o-table-context-menu></o-table-context-menu>
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

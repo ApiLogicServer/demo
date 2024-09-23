@@ -12,16 +12,16 @@
 #        http://localhost:5656
 #
 #    You typically do not customize this file.
-
-#    (v 11.00.28, August 20, 2024 12:48:24)
+#
+#    (v 11.02.00, September 23, 2024 09:24:47)
 #
 #    See Main Code (at end).
 #        Use log messages to understand API and Logic activation.
 #
 ###############################################################################
 
-api_logic_server__version = '11.00.28'
-api_logic_server_created__on = 'August 20, 2024 12:48:24'
+api_logic_server__version = '11.02.00'
+api_logic_server_created__on = 'September 23, 2024 09:24:47'
 api_logic_server__host = 'localhost'
 api_logic_server__port = '5656'
 
@@ -124,9 +124,9 @@ if __name__ == "__main__":
                 f'.... with flask_host: {args.flask_host}\n'
                 f'.... and  swagger_port: {args.swagger_port}')
     if logic_alerts:
-        app_logger.info(f'\nAlert: These following are **Critical** to unlocking value:')
-        app_logger.info(f'.. see logic.declare_logic.py       -- {declare_logic_message}')
-        app_logger.info(f'.. see security.declare_security.py -- {declare_security_message}\n\n')
+        app_logger.info(f'\nAlert: These following are **Critical** to unlocking value for project: {project_name}:')
+        app_logger.info(f'.. see logic.declare_logic.py       -- {server_setup.declare_logic_message}')
+        app_logger.info(f'.. see security.declare_security.py -- {server_setup.declare_security_message}\n\n')
 
         app_logger.info(f'*************************************************************************')    
         app_logger.info(f'*   Startup Instructions: Open your Browser at: {args.http_scheme}://{args.swagger_host}:{args.port}   *')    
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     flask_app.run(host=args.flask_host, threaded=True, port=args.port)
 else:
-    msg = f'API Logic Project Loaded (WSGI), version 11.00.28\n'
+    msg = f'API Logic Project Loaded (WSGI), version 11.02.00\n'
     msg += f'.. startup message: {start_up_message}\n'
 
     if server_setup.is_docker():

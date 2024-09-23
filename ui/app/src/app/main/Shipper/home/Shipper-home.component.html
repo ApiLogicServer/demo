@@ -1,10 +1,10 @@
-<o-form attr="Shipper" mode="tab" title="{{ 'SHIPPER' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Shipper" mode="tab" title="SHIPPER">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="ShipperTable" 
             service="Shipper" 
             entity="Shipper" 
-            title="{{ 'SHIPPER' | oTranslate }}"
+            title="SHIPPER"
             keys="Id"
             columns="CompanyName;Phone;Id" 
             header-actions="R;D"
@@ -32,4 +32,4 @@
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

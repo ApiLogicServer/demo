@@ -1,10 +1,10 @@
-<o-form attr="Territory" mode="tab" title="{{ 'TERRITORY' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Territory" mode="tab" title="TERRITORY">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="TerritoryTable" 
             service="Territory" 
             entity="Territory" 
-            title="{{ 'TERRITORY' | oTranslate }}"
+            title="TERRITORY"
             keys="Id"
             columns="TerritoryDescription;Id;RegionId" 
             header-actions="R;D"
@@ -24,7 +24,7 @@
             
             <o-table-column #TerritoryDescription attr="TerritoryDescription" title=" Territory Description*" editable="no" required="no" content-align="left"></o-table-column>
             
-            <o-table-column #Id attr="Id" title="Id" editable="no" required="yes" content-align="left"></o-table-column>
+            <o-table-column #Id attr="Id" title="Id" editable="no" required="no" content-align="left"></o-table-column>
             
             <o-table-column #RegionId attr="RegionId" title="RegionId" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
             
@@ -32,4 +32,4 @@
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

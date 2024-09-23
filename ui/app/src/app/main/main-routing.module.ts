@@ -37,8 +37,6 @@ export const routes: Routes = [
     
         { path: 'Region', loadChildren: () => import('./Region/Region.module').then(m => m.RegionModule) },
     
-        { path: 'SampleDBVersion', loadChildren: () => import('./SampleDBVersion/SampleDBVersion.module').then(m => m.SampleDBVersionModule) },
-    
         { path: 'Shipper', loadChildren: () => import('./Shipper/Shipper.module').then(m => m.ShipperModule) },
     
         { path: 'Supplier', loadChildren: () => import('./Supplier/Supplier.module').then(m => m.SupplierModule) },

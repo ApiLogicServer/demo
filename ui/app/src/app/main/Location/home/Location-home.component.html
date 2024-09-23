@@ -1,10 +1,10 @@
-<o-form attr="Location" mode="tab" title="{{ 'LOCATION' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Location" mode="tab" title="LOCATION">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="LocationTable" 
             service="Location" 
             entity="Location" 
-            title="{{ 'LOCATION' | oTranslate }}"
+            title="LOCATION"
             keys="country;city"
             columns="country;city;notes" 
             header-actions="R;D"
@@ -32,4 +32,4 @@
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

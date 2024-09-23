@@ -1,4 +1,3 @@
-<o-breadcrumb [form]="EmployeeAuditForm" label-columns="" separator=" "></o-breadcrumb>
 <o-form #EmployeeAuditForm attr="EmployeeAudit_form_insert" service="EmployeeAudit" entity="EmployeeAudit" 
 keys="Id" fxLayout="column" show-header="yes" header-actions="I"
 horizontal-scroll="yes"
@@ -36,9 +35,9 @@ after-insert-mode="new" class="standalone-form-container" (onInsertMode)="onInse
       
         <o-text-input #CreatedOn attr="CreatedOn" label="CreatedOn" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
       
-        <o-text-input #UpdatedOn attr="UpdatedOn" label="UpdatedOn" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
-      
         <o-text-input #CreatedBy attr="CreatedBy" label="CreatedBy" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
+      
+        <o-text-input #UpdatedOn attr="UpdatedOn" label="UpdatedOn" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
       
         <o-text-input #UpdatedBy attr="UpdatedBy" label="UpdatedBy" enabled="yes" required="no" fxFlex="20%" class="form-field"></o-text-input>
       

@@ -24,8 +24,6 @@ import { ProductCardComponent } from './Product-card/Product-card.component';
 
 import { RegionCardComponent } from './Region-card/Region-card.component';
 
-import { SampleDBVersionCardComponent } from './SampleDBVersion-card/SampleDBVersion-card.component';
-
 import { ShipperCardComponent } from './Shipper-card/Shipper-card.component';
 
 import { SupplierCardComponent } from './Supplier-card/Supplier-card.component';
@@ -65,8 +63,6 @@ export const MENU_CONFIG: MenuRootItem[] = [
         ,{ id: 'Product', name: 'PRODUCT', icon: 'view_list', route: '/main/Product' }
     
         ,{ id: 'Region', name: 'REGION', icon: 'view_list', route: '/main/Region' }
-    
-        ,{ id: 'SampleDBVersion', name: 'SAMPLEDBVERSION', icon: 'view_list', route: '/main/SampleDBVersion' }
     
         ,{ id: 'Shipper', name: 'SHIPPER', icon: 'view_list', route: '/main/Shipper' }
     
@@ -109,8 +105,6 @@ export const MENU_COMPONENTS = [
     ,ProductCardComponent
 
     ,RegionCardComponent
-
-    ,SampleDBVersionCardComponent
 
     ,ShipperCardComponent
 

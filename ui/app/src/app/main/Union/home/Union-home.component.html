@@ -1,10 +1,10 @@
-<o-form attr="Union" mode="tab" title="{{ 'UNION' | oTranslate }}" class="fill-form">
+<o-form-Layout-manager attr="Union" mode="tab" title="UNION">
     <div fxFill fxLayout="column" fxLayoutAlign="start">
         <o-table 
             attr="UnionTable" 
             service="Union" 
             entity="Union" 
-            title="{{ 'UNION' | oTranslate }}"
+            title="UNION"
             keys="Id"
             columns="Name;Id" 
             header-actions="R;D"
@@ -30,4 +30,4 @@
             <o-table-paginator page-size-options="24;48;96"></o-table-paginator>
         </o-table>
     </div>
-</o-form>
+</o-form-Layout-manager>

@@ -18,6 +18,7 @@ import sqlalchemy
 import requests
 from datetime import date
 from config.config import Args
+from config.config import Config
 import os
 from pathlib import Path
 from api.system.expression_parser import parsePayload
@@ -74,7 +75,7 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
 
     
     def gen_export(request) -> any:
-        payload = json.loads(request.data)
+        payload = json.loads(request.data) if request.data != b'' else {}
         type = payload.get("type") or "csv"
         entity = payload.get("dao") 
         queryParm = payload.get("queryParm") or {}
@@ -110,10 +111,39 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
         attributes = resources["resources"][api_clz.__name__]["attributes"]
     
         return gen_report(api_clz, request, _project_dir, payload, attributes)
-        
+    @app.route("/api/export/csv", methods=['POST','OPTIONS'])
+    @app.route("/api/export/pdf", methods=['POST','OPTIONS'])
+    @app.route("/ontimizeweb/services/rest/export/pdf", methods=['POST','OPTIONS'])
+    @app.route("/ontimizeweb/services/rest/export/csv", methods=['POST','OPTIONS'])
+    @cross_origin()
+    @admin_required()
+    def export():
+        print(f"export {request.path}")
+        #if request.method == "OPTIONS":
+        #    return jsonify(success=True)
+        return gen_export(request)
+    
+    @app.route("/api/dynamicjasper", methods=['POST','OPTIONS'])
+    @app.route("/ontimizeweb/services/rest/dynamicjasper", methods=['POST','OPTIONS'])
+    @cross_origin()
+    @admin_required()
+    def dynamicjasper():
+        if request.method == "OPTIONS":
+            return jsonify(success=True)
+        return _gen_report(request)
+    
+    @app.route("/api/bundle", methods=['POST','OPTIONS'])
+    @app.route("/ontimizeweb/services/rest/bundle", methods=['POST','OPTIONS'])
+    @cross_origin()
+    @admin_required()
+    def bundle():
+        if request.method == "OPTIONS":
+            return jsonify(success=True)
+        return jsonify({"code":0,"data":{},"message": None})
+    
     # Ontimize apiEndpoint path for all services
     @app.route("/ontimizeweb/services/rest/<path:path>", methods=['GET','POST','PUT','PATCH','DELETE','OPTIONS'])
-    @cross_origin()
+    @cross_origin(supports_credentials=True)
     @admin_required()
     def api_search(path):
         s = path.split("/")
@@ -125,6 +155,13 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
         #CORS 
         if method == "OPTIONS":
             return jsonify(success=True)
+        
+        if clz_name == "endsession":
+            from flask import g
+            sessionid = request.args.get("sessionid")
+            if "access_token" in g and g.access_token == sessionid:
+                g.pop("access_token")
+            return jsonify({"code":0,"data":{},"message": None})
         
         if clz_name == "dynamicjasper":
             return _gen_report(request)
@@ -147,9 +184,13 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
         api_attributes = resource["attributes"]
         api_clz = resource["model"]
         
-        payload = json.loads(request.data)
+        payload = '{}' if request.data == b'' else json.loads(request.data)
         expressions, filter, columns, sqltypes, offset, pagesize, orderBy, data = parsePayload(api_clz, payload)
         result = {}
+        if method == 'GET':
+            pagesize = 999 #if isSearch else pagesize
+            return get_rows(request, api_clz, filter, orderBy, columns, pagesize, offset)
+        
         if method in ['PUT','PATCH']:
             sql_alchemy_row = session.query(api_clz).filter(text(filter)).one()
             for key in DotDict(data):
@@ -183,7 +224,7 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
                 if "TypeAggregate" in clz_type:
                     return get_rows_agg(request, api_clz, clz_type, filter, columns)
                 else:
-                    pagesize = 999 if isSearch else pagesize
+                    pagesize = 999 # if isSearch else pagesize
                     return get_rows(request, api_clz, None, orderBy, columns, pagesize, offset)
         try:        
             session.commit()
@@ -203,10 +244,38 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
         return None
     
     def login(request):
-        url = f"http://{request.host}/api/auth/login"
-        requests.post(url=url, headers=request.headers, json = {})
-        return jsonify({"code":0,"message":"Login Successful","data":{}})
-       
+        url = f"{request.scheme}://{request.host}/api/auth/login"
+        # no data is passed - uses basic auth in header
+        #requests.post(url=url, headers=request.headers, json = {})
+        username = ''
+        password = ''
+        auth = request.headers.get("Authorization", None)
+        if auth and auth.startswith("Basic"):  # support basic auth
+            import base64
+            base64_message = auth[6:]
+            print(f"auth found: {auth}")
+            #base64_message = 'UHl0aG9uIGlzIGZ1bg=='
+            base64_bytes = base64_message.encode('ascii')
+            message_bytes = base64.b64decode(base64_bytes)
+            message = message_bytes.decode('ascii')
+            s = message.split(":")
+            username = s[0]
+            password = s[1]
+        from security.authentication_provider.abstract_authentication_provider import Abstract_Authentication_Provider
+        from security.system.authentication import create_access_token
+        
+        authentication_provider : Abstract_Authentication_Provider = Config.SECURITY_PROVIDER 
+        if not authentication_provider:
+            return jsonify({"code":1,"message":"No authentication provider configured"}), 401
+        user = authentication_provider.get_user(username, password)
+        if not user or not authentication_provider.check_password(user = user, password = password):
+            return jsonify({"code":1,"message":"Wrong username or password"}), 401
+        
+        access_token = create_access_token(identity=user)  # serialize and encode
+        from flask import g
+        g.access_token = access_token
+        #return jsonify(access_token=access_token)
+        return jsonify({"code":0,"message":"Login Successful","data":{"access_token":access_token}})
     
     def get_rows_agg(request: any, api_clz, agg_type, filter, columns):
         key = api_clz.__name__
@@ -289,7 +358,7 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
         #rows = session.query(models.Account.ACCOUNTTYPEID,func.count(models.Account.AccountID)).group_by(models.Account.ACCOUNTTYPEID).all()
         return data
     
-    def get_rows(request: any, api_clz, filter, order_by, columns, pagesize, offset):
+    def get_rows(request: any, api_clz, filter: str, order_by: str, columns: list, pagesize: int, offset: int):
         # New Style
         key = api_clz.__name__.lower()
         resources = getMetaData(api_clz.__name__)
@@ -311,7 +380,8 @@ def add_service(app, api, project_dir, swagger_host: str, PORT: str, method_deco
         request.method = 'GET'
         r = CustomEndpoint(model_class=api_clz, fields=list_of_columns, filter_by=filter, pagesize=pagesize, offset=offset)
         result = r.execute(request=request)
-        return r.transform("IMATIA",key, result)
+        service_type: str = Config.ONTIMIZE_SERVICE_TYPE
+        return r.transform(service_type, key, result) # JSONAPI or LAC or OntimizeEE ARGS.service_type
     
     def get_rows_by_query(api_clz, filter, orderBy, columns, pagesize, offset):
         #Old Style

@@ -3,8 +3,8 @@
 # intended for use in portal cli - not to be run on your local machine.
 
 projectname="apilogicserver_project"  # project directory
-resourcename="apilogicproject"  # lower case, only
-resourcegroup="apilogicproject_rg"
+resourcename="demo"  # lower case, only
+resourcegroup="demo_rg"
 dockerrepositoryname="apilogicserver"  # change this to your DockerHub Repository
 githubaccount="apilogicserver"         # change this to your GitHub account
 version="1.0.0"
@@ -14,8 +14,8 @@ version="1.0.0"
 # which uses: https://github.com/Azure-Samples/multicontainerwordpress
 
 # login to Azure Portal CLI (substitute your github account for apilogicserver)
-# git clone https://github.com/apilogicserver/apilogicproject.git
-# cd apilogicproject
+# git clone https://github.com/apilogicserver/demo.git
+# cd demo
 # sh devops/docker-compose-dev-azure/azure-deploy.sh
 
 echo " "
@@ -79,9 +79,9 @@ az appservice plan create --name myAppServicePlan --resource-group $resourcegrou
 az container create --resource-group $resourcegroup --name ${projectname} --image ${dockerrepositoryname}/${resourcename}:latest --dns-name-label ${resourcename} --ports 5656 --environment-variables 'VERBOSE'='True'  'APILOGICPROJECT_CLIENT_URI'='//{resourcename}.westus.azurecontainer.io:5656'
 
 # or, issue commands like these (fix the git repo name) directly in portal, or local az cli
-az group create --name apilogicproject_rg --location "westus"
-az appservice plan create --name myAppServicePlan --resource-group apilogicproject_rg --sku S1 --is-linux
-az container create --resource-group apilogicproject_rg --name apilogicproject --image apilogicserver/apilogicproject:latest --dns-name-label apilogicproject --ports 5656 --environment-variables 'VERBOSE'='True'  'APILOGICPROJECT_CLIENT_URI'='//apilogicproject.westus.azurecontainer.io:5656'
+az group create --name demo_rg --location "westus"
+az appservice plan create --name myAppServicePlan --resource-group demo_rg --sku S1 --is-linux
+az container create --resource-group demo_rg --name demo --image apilogicserver/demo:latest --dns-name-label demo --ports 5656 --environment-variables 'VERBOSE'='True'  'APILOGICPROJECT_CLIENT_URI'='//demo.westus.azurecontainer.io:5656'
 
 # e.g.: az container create --resource-group aicustomerorders_rg --name aicustomerorders --image apilogicserver/aicustomerorders:latest --dns-name-label aicustomerorders --ports 5656 --environment-variables VERBOSE=True APILOGICPROJECT_CLIENT_URI=//aicustomerorders.westus.azurecontainer.io:5656
 

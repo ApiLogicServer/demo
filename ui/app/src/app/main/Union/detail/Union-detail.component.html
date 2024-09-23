@@ -31,11 +31,11 @@
         entity="Employee" 
         keys="Id"
         parent-keys="UnionId:Id"
-        columns="LastName;OnLoanDepartmentId;UnionId;WorksForDepartmentId;FirstName;Title;TitleOfCourtesy;BirthDate;HireDate;Address;City;Region;PostalCode;Country;HomePhone;Extension;Notes;ReportsTo;PhotoPath;EmployeeType;Salary;Dues;Id"  
+        columns="LastName;OnLoanDepartmentId;WorksForDepartmentId;Salary;ProperSalary;EmployeeType;Dues;FirstName;Id;Title;TitleOfCourtesy;BirthDate;HireDate;Address;City;Region;PostalCode;Country;HomePhone;Extension;ReportsTo;PhotoPath;Notes"  
         horizontal-scroll="yes"
         detail-form-route="Employee" 
         edit-form-route="Employee"
-        visible-columns="LastName;OnLoanDepartmentId;UnionId;WorksForDepartmentId;FirstName;Title;TitleOfCourtesy;BirthDate;HireDate;Address;City;Region;PostalCode;Country;HomePhone;Extension;Notes;ReportsTo;PhotoPath;EmployeeType;Salary;Dues;Id"  
+        visible-columns="LastName;OnLoanDepartmentId;WorksForDepartmentId;Salary;ProperSalary;EmployeeType;Dues;FirstName;Id;Title;TitleOfCourtesy;BirthDate;HireDate;Address;City;Region;PostalCode;Country;HomePhone;Extension;ReportsTo;PhotoPath;Notes"  
         sort-columns="LastName" 
         query-rows="25" 
         quick-filter="yes"
@@ -62,15 +62,6 @@
     </o-table-cell-renderer-service>
 </o-table-column>
         
-          <o-table-column attr="UnionId" title="Union">
-    <o-table-cell-renderer-service attr="UnionId" 
-        service="Union" entity="UnionType" columns="Id;Name"
-        parent-keys="Id:UnionId"
-        value-column="Name" keys="UnionId"
-        visible-columns="Name" separator=" - " width="680px">
-    </o-table-cell-renderer-service>
-</o-table-column>
-        
           <o-table-column attr="WorksForDepartmentId" title="WorksForDepartment">
     <o-table-cell-renderer-service attr="WorksForDepartmentId" 
         service="Department" entity="DepartmentType" columns="Id;DepartmentName"
@@ -80,7 +71,17 @@
     </o-table-cell-renderer-service>
 </o-table-column>
         
+          <o-table-column #Salary attr="Salary" title="Salary" type="real" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000.0000" content-align="center"></o-table-column>
+        
+          <o-table-column #ProperSalary attr="ProperSalary" title="ProperSalary" type="real" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000.0000" content-align="center"></o-table-column>
+        
+          <o-table-column #EmployeeType attr="EmployeeType" title="EmployeeType" editable="no" required="no" content-align="left"></o-table-column>
+        
+          <o-table-column #Dues attr="Dues" title="Dues" type="real" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000.0000" content-align="center"></o-table-column>
+        
           <o-table-column #FirstName attr="FirstName" title="FirstName" editable="no" required="no" content-align="left"></o-table-column>
+        
+          <o-table-column #Id attr="Id" title="Id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
         
           <o-table-column #Title attr="Title" title="Title" editable="no" required="no" content-align="left"></o-table-column>
         
@@ -104,19 +105,11 @@
         
           <o-table-column #Extension attr="Extension" title="Extension" editable="no" required="no" content-align="left"></o-table-column>
         
-          <o-table-column #Notes attr="Notes" title="Notes" editable="no" required="no" content-align="left"></o-table-column>
-        
           <o-table-column #ReportsTo attr="ReportsTo" title="ReportsTo" type="integer" editable="no" required="no" content-align="center"></o-table-column>
         
           <o-table-column #PhotoPath attr="PhotoPath" title="PhotoPath" editable="no" required="no" content-align="left"></o-table-column>
         
-          <o-table-column #EmployeeType attr="EmployeeType" title="EmployeeType" editable="no" required="no" content-align="left"></o-table-column>
-        
-          <o-table-column #Salary attr="Salary" title="Salary" type="real" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000.0000" content-align="center"></o-table-column>
-        
-          <o-table-column #Dues attr="Dues" title="Dues" type="real" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000.0000" content-align="center"></o-table-column>
-        
-          <o-table-column #Id attr="Id" title="Id" type="integer" editable="no" required="no" content-align="center"></o-table-column>
+          <o-textarea-input #Notes attr="Notes" title="Notes" rows="10" content-align="center"></o-textarea-input>
         
         <o-table-paginator page-size-options="25;50;100"></o-table-paginator>
       </o-table>

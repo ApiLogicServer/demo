@@ -26,15 +26,15 @@
       
       <o-integer-input #ReorderLevel attr="ReorderLevel" label="ReorderLevel" type="integer" editable="no" required="yes" ></o-integer-input>
       
+      <o-integer-input #Discontinued attr="Discontinued" label="Discontinued" type="integer" editable="no" required="yes" ></o-integer-input>
+      
+      <o-integer-input #UnitsShipped attr="UnitsShipped" label="UnitsShipped" type="integer" editable="no" required="no" ></o-integer-input>
+      
       <o-integer-input #Id attr="Id" label="Id" type="integer" editable="no" required="no" ></o-integer-input>
       
       <o-integer-input #SupplierId attr="SupplierId" label="SupplierId" type="integer" editable="no" required="yes" ></o-integer-input>
       
       <o-integer-input #CategoryId attr="CategoryId" label="CategoryId" type="integer" editable="no" required="yes" ></o-integer-input>
-      
-      <o-integer-input #Discontinued attr="Discontinued" label="Discontinued" type="integer" editable="no" required="yes" ></o-integer-input>
-      
-      <o-integer-input #UnitsShipped attr="UnitsShipped" label="UnitsShipped" type="integer" editable="no" required="no" ></o-integer-input>
       
     </div>
   </o-row>
@@ -49,11 +49,11 @@
         entity="OrderDetail" 
         keys="Id"
         parent-keys="ProductId:Id"
-        columns="Id;OrderId;ProductId;UnitPrice;Quantity;Discount;Amount;ShippedDate"  
+        columns="Id;ProductId;OrderId;UnitPrice;Quantity;Discount;Amount;ShippedDate"  
         horizontal-scroll="yes"
         detail-form-route="OrderDetail" 
         edit-form-route="OrderDetail"
-        visible-columns="Id;OrderId;ProductId;UnitPrice;Quantity;Discount;Amount;ShippedDate"  
+        visible-columns="Id;ProductId;OrderId;UnitPrice;Quantity;Discount;Amount;ShippedDate"  
         sort-columns="Id" 
         query-rows="25" 
         quick-filter="yes"
@@ -71,15 +71,6 @@
         
           <o-table-column #Id attr="Id" title=" Id*" type="integer" editable="no" required="no" content-align="center"></o-table-column>
         
-          <o-table-column attr="OrderId" title="Order">
-    <o-table-cell-renderer-service attr="OrderId" 
-        service="Order" entity="OrderType" columns="Id;ShipName"
-        parent-keys="Id:OrderId"
-        value-column="ShipName" keys="OrderId"
-        visible-columns="ShipName" separator=" - " width="680px">
-    </o-table-cell-renderer-service>
-</o-table-column>
-        
           <o-table-column attr="ProductId" title="Product">
     <o-table-cell-renderer-service attr="ProductId" 
         service="Product" entity="ProductType" columns="Id;ProductName"
@@ -89,9 +80,18 @@
     </o-table-cell-renderer-service>
 </o-table-column>
         
+          <o-table-column attr="OrderId" title="Order">
+    <o-table-cell-renderer-service attr="OrderId" 
+        service="Order" entity="OrderType" columns="Id;Id"
+        parent-keys="Id:OrderId"
+        value-column="Id" keys="OrderId"
+        visible-columns="Id" separator=" - " width="680px">
+    </o-table-cell-renderer-service>
+</o-table-column>
+        
           <o-table-column #UnitPrice attr="UnitPrice" title="UnitPrice" type="real" min-decimal-digits="2" max-decimal-digits="4" min="0" max="1000000.0000" content-align="center"></o-table-column>
         
-          <o-table-column #Quantity attr="Quantity" title="Quantity" type="integer" editable="no" required="yes" content-align="center"></o-table-column>
+          <o-table-column #Quantity attr="Quantity" title="Quantity" type="integer" editable="no" required="no" content-align="center"></o-table-column>
         
           <o-table-column #Discount attr="Discount" title="Discount" editable="no" required="no" content-align="left"></o-table-column>
         
