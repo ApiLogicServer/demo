@@ -327,6 +327,13 @@ Just as you can customize apis, you can complement rule-based logic using Python
 &nbsp;
 > **Key Takeway -  Extensible Rules, Kafka Message Produced**<br>Rule-based logic is extensible with Python, here producing a Kafka message with 20 lines of code.
 
+
+&nbsp;
+
+### 3.e Customize the Data Model
+
+You can also alter the data model, while preserving customizations.  For more information, see [Database Design Changes](https://apilogicserver.github.io/Docs/Database-Changes/).
+
 &nbsp;
 
 ## Testing
@@ -539,8 +546,8 @@ For information on Managing API Logic Projects, [click here](https://apilogicser
 
 | About                    | Info                               |
 |:-------------------------|:-----------------------------------|
-| Created                  | September 23, 2024 09:24:47                      |
-| API Logic Server Version | 11.02.00           |
+| Created                  | October 10, 2024 12:46:23                      |
+| API Logic Server Version | 11.02.11           |
 | Created in directory     | ../../../servers/demo |
 | API Name                 | api          |
 | Execution begins with    | `api_logic_server_run.py`          |

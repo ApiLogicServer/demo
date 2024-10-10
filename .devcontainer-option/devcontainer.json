@@ -32,7 +32,6 @@
             }
         }
     },
-
 	
 	"portsAttributes": {
 		"5656": {
@@ -45,7 +44,7 @@
 	
 	"features": {
 		"github-cli": "latest"
-	  },
+	  }
 
 	// "postAttachCommand": "/bin/bash .devcontainer/setup.sh"
 
